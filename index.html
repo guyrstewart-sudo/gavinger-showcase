@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gavinger — Visionary Art &amp; Funktional Furniture by Gavin Gerundo</title>
+<meta name="description" content="An infinite dive through the hand-painted worlds of Gavin Gerundo — kinetic furniture, grandfather clocks, visionary canvases. Geometric with the organic; the finite revealing the infinite.">
+<meta property="og:title" content="Gavinger — Visionary Art &amp; Funktional Furniture">
+<meta property="og:description" content="Scroll into the paintings. An infinite fractal dive through ten of Gavin Gerundo's highest works.">
+<meta property="og:image" content="https://guyrstewart-sudo.github.io/gavinger-showcase/media/og-card.jpg">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/png" href="media/favicon.png">
+<link rel="preload" href="fonts/Cormorant-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/InstrumentSans-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- entry: the dark before the room -->
+<div id="entry" aria-hidden="true">
+  <svg id="entry-rosette" viewBox="0 0 64 64" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1">
+    <circle cx="32" cy="32" r="26" class="ros"/>
+    <circle cx="32" cy="32" r="12" class="ros"/>
+    <g class="ros-spokes">
+      <line x1="32" y1="6"  x2="32" y2="58"/><line x1="6"  y1="32" x2="58" y2="32"/>
+      <line x1="13.6" y1="13.6" x2="50.4" y2="50.4"/><line x1="50.4" y1="13.6" x2="13.6" y2="50.4"/>
+      <line x1="22" y1="8.7" x2="42" y2="55.3"/><line x1="42" y1="8.7" x2="22" y2="55.3"/>
+      <line x1="8.7" y1="22" x2="55.3" y2="42"/><line x1="8.7" y1="42" x2="55.3" y2="22"/>
+      <line x1="27" y1="7" x2="37" y2="57"/><line x1="37" y1="7" x2="27" y2="57"/>
+      <line x1="7" y1="27" x2="57" y2="37"/><line x1="7" y1="37" x2="57" y2="27"/>
+    </g>
+  </svg>
+  <div id="entry-wordmark">GAVINGER</div>
+</div>
+
+<!-- flashlight cursor (pointer:fine only) -->
+<div id="cursor" aria-hidden="true"><span id="cursor-dot"></span><span id="cursor-ring"></span></div>
+
+<header id="site-head">
+  <a id="brand" href="#dive" aria-label="Gavinger — back to the beginning">GAVINGER</a>
+  <button id="index-open" type="button" aria-haspopup="dialog" aria-controls="index-overlay">INDEX</button>
+</header>
+
+<!-- progress rail -->
+<aside id="rail" aria-hidden="true">
+  <div id="rail-counter">01 / 10</div>
+  <div id="rail-track">
+    <div id="rail-glow"></div>
+    <div id="rail-fill"></div>
+    <div id="rail-ticks"></div>
+  </div>
+  <div id="rail-title"></div>
+</aside>
+
+<main>
+  <h1 class="sr-only">Gavinger — visionary art and funktional furniture by Gavin Gerundo</h1>
+  <!-- 01 · THE DIVE -->
+  <section id="dive" class="dive-stage" data-section="dive">
+    <div id="dive-layers"></div>
+    <div id="dive-wordmark" aria-hidden="true">GAVINGER</div>
+    <div id="dive-cards"></div>
+    <p id="dive-hint" aria-hidden="true">Scroll to enter</p>
+    <button id="loop-pill" class="pill" type="button">Return to the beginning</button>
+  </section>
+
+  <!-- 02 · THE TIMELESS COLLECTION -->
+  <section id="timeless" class="chapter" data-section="timeless">
+    <div class="chapter-head">
+      <p class="eyebrow"><span class="eyebrow-num">02</span><span class="eyebrow-dot">&middot;</span><span class="eyebrow-kind">The Timeless Collection</span></p>
+      <h2 class="headline">Clocks that keep <em>becoming</em>.</h2>
+      <p class="support">Hand-painted wall clocks, every dial a mandala in motion. The pendulums are real; so is the paint.</p>
+    </div>
+    <div id="timeless-pin">
+      <div id="timeless-track"></div>
+    </div>
+  </section>
+
+  <!-- 03 · FUNKTIONAL FURNITURE -->
+  <section id="funktional" class="chapter" data-section="funktional">
+    <div class="chapter-head">
+      <p class="eyebrow"><span class="eyebrow-num">03</span><span class="eyebrow-dot">&middot;</span><span class="eyebrow-kind">Funktional Furniture</span></p>
+      <h2 class="headline">Furniture with an inner <em>life</em>.</h2>
+      <p class="support">Grandfather clocks, curio cabinets, jewelry boxes — stripped to raw wood and reborn freehand. No tape. No stencils.</p>
+    </div>
+    <div id="funk-grid" class="grid"></div>
+  </section>
+
+  <!-- 04 · ORIGINALS & PRINTS -->
+  <section id="originals" class="chapter" data-section="originals">
+    <div class="chapter-head">
+      <p class="eyebrow"><span class="eyebrow-num">04</span><span class="eyebrow-dot">&middot;</span><span class="eyebrow-kind">Originals &amp; Prints</span></p>
+      <h2 class="headline">The finite, revealing the <em>infinite</em>.</h2>
+      <p class="support">Original canvases, the twelve-sign Gonzodiac, the Deeper Depths series, tapestries and small treasures.</p>
+    </div>
+    <div id="mosaic"></div>
+  </section>
+
+  <!-- 05 · MURALS -->
+  <section id="murals" class="chapter chapter-bleed" data-section="murals">
+    <figure id="mural-figure">
+      <img src="media/img/files__WebBanner5.webp" alt="A visionary mural by Gavin Gerundo — winged mandala gateway painted wall to wall" loading="lazy" decoding="async">
+    </figure>
+    <div class="chapter-head over-bleed">
+      <p class="eyebrow"><span class="eyebrow-num">05</span><span class="eyebrow-dot">&middot;</span><span class="eyebrow-kind">Murals</span></p>
+      <h2 class="headline">Walls are just larger <em>canvases</em>.</h2>
+      <p class="support">Rooms, storefronts, sanctuaries — painted into portals. Commissions open for spaces that want to wake up.</p>
+      <a class="pill" href="https://gavinger.com/pages/contact" target="_blank" rel="noopener">Commission a mural <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </section>
+
+  <!-- 06 · THE ARTIST -->
+  <section id="about" class="chapter" data-section="about">
+    <div class="about-grid">
+      <figure id="about-portrait">
+        <img src="media/img/files__Bio.webp" alt="Gavin Gerundo at his workbench, painting a green geometric panel with a paint pen" loading="lazy" decoding="async">
+      </figure>
+      <div class="chapter-head">
+        <p class="eyebrow"><span class="eyebrow-num">06</span><span class="eyebrow-dot">&middot;</span><span class="eyebrow-kind">The Artist</span></p>
+        <h2 class="headline">Gavin Gerundo paints the space <em>between</em>.</h2>
+        <p class="support long">Cincinnati-born, trained in Industrial Design, forged in the music scene — first painting live beside the stage, then painting leather as Gonzo Gear, then giving whole rooms and hundred-year-old furniture a second, stranger life.</p>
+        <p class="support long">His work has hung at Alex Grey&rsquo;s Chapel of Sacred Mirrors in New York, and has shown during Miami&rsquo;s Art Basel week at the Spectrum and Red Dot fairs. The mission has never moved: challenge our perceptions, and inspire moments of awe — the geometric with the organic, the finite revealing the infinite.</p>
+        <a class="pill" href="https://gavinger.com" target="_blank" rel="noopener">Visit the gallery shop <span aria-hidden="true">&rarr;</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 · CORRESPONDENCE -->
+  <section id="contact" class="chapter" data-section="contact">
+    <div class="chapter-head center">
+      <p class="eyebrow"><span class="eyebrow-num">07</span><span class="eyebrow-dot">&middot;</span><span class="eyebrow-kind">Correspondence</span></p>
+      <h2 class="headline">Begin a <em>conversation</em>.</h2>
+      <p class="support">Commissions, collection inquiries, or a note about a piece that stayed with you.</p>
+      <div class="cta-row">
+        <a class="pill" href="https://gavinger.com/pages/contact" target="_blank" rel="noopener">Contact the studio <span aria-hidden="true">&rarr;</span></a>
+        <a class="pill pill-quiet" href="https://gavinger.com" target="_blank" rel="noopener">Shop the full collection</a>
+      </div>
+    </div>
+    <footer id="site-foot">
+      <div id="workshop-clock" aria-label="Local time at the workshop">
+        <span id="clock-time">00:00:00</span>
+        <span id="clock-note">The workshop keeps its own time.</span>
+      </div>
+      <p id="fine-print">&copy; <span id="year">2026</span> Gavin Gerundo · All works hand-painted · Commerce &amp; checkout live at <a href="https://gavinger.com" target="_blank" rel="noopener">gavinger.com</a></p>
+    </footer>
+  </section>
+</main>
+
+<!-- INDEX — exhibition checklist -->
+<div id="index-overlay" role="dialog" aria-modal="true" aria-label="Exhibition index" hidden>
+  <button id="index-close" type="button" aria-label="Close index">ESC</button>
+  <p class="eyebrow center"><span class="eyebrow-kind">Exhibition Index</span></p>
+  <ol id="index-list"></ol>
+  <p id="index-foot"><a href="https://gavinger.com" target="_blank" rel="noopener">gavinger.com &rarr;</a></p>
+</div>
+
+<noscript>
+  <div class="noscript-note">
+    <p>This exhibition moves with JavaScript enabled. The collection itself lives at
+    <a href="https://gavinger.com">gavinger.com</a>.</p>
+  </div>
+</noscript>
+
+<script src="js/vendor/gsap.min.js"></script>
+<script src="js/vendor/ScrollTrigger.min.js"></script>
+<script>gsap.registerPlugin(ScrollTrigger);</script>
+<script src="js/data.js"></script>
+<script src="js/chain.js"></script>
+<script src="js/dive.js"></script>
+<script src="js/sections.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

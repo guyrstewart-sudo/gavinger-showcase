@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Dive, Upgraded — Higgsfield Morphs &amp; 4K · Gavinger</title>
+<meta name="description" content="For Gavin: exactly how Seedance 2.0 morph transitions and 4K upscaling transform the Fractal Dive from a beautiful illusion into a continuous painted journey.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="media/favicon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  :root {
+    --bg: #050505; --ink: #E9E6DF; --muted: #8F8C84; --accent: #ffc93c;
+    --hairline: rgba(233,230,223,0.15);
+    --serif: 'Cormorant', Georgia, serif;
+    --sans: 'Instrument Sans', system-ui, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+  img, video { max-width: 100%; display: block; }
+  a { color: inherit; }
+  main { max-width: 1060px; margin: 0 auto; padding: 10vh clamp(1.4rem, 5vw, 4rem) 12vh; }
+  .eyebrow { font: 500 0.6875rem/1 var(--sans); text-transform: uppercase; letter-spacing: 0.32em; color: var(--muted); }
+  .eyebrow b { color: var(--accent); font-weight: 500; letter-spacing: 0.22em; }
+  h1 { font: 300 clamp(2.6rem, 6vw, 4.8rem)/1.05 var(--serif); margin: 3vh 0 2vh; max-width: 18ch; text-wrap: balance; }
+  h1 em, h2 em { font-style: italic; font-weight: 300; }
+  h2 { font: 300 clamp(1.8rem, 3.6vw, 2.7rem)/1.1 var(--serif); margin: 0 0 1.2rem; }
+  section { margin-top: 12vh; }
+  p.lead { color: var(--muted); max-width: 62ch; font-size: 0.9375rem; }
+  p.lead + p.lead { margin-top: 0.9em; }
+  p.lead strong { color: var(--ink); font-weight: 500; }
+  .cap { font: italic 400 0.8125rem/1.5 var(--serif); color: var(--muted); margin-top: 0.7rem; }
+  .panel { border: 1px solid var(--hairline); border-radius: 6px; overflow: hidden; background: #0a0a0a; }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 3vw, 2.4rem); margin-top: 3vh; align-items: start; }
+  @media (max-width: 760px) { .duo { grid-template-columns: 1fr; } }
+
+  /* live re-creation of the current CSS transition */
+  .demo { position: relative; aspect-ratio: 16 / 9; }
+  .demo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .demo .a { transform-origin: 37% 70%; animation: diveA 9s ease-in-out infinite; }
+  .demo .b { opacity: 0; animation: diveB 9s ease-in-out infinite; }
+  @keyframes diveA {
+    0%, 22% { transform: scale(1); opacity: 1; }
+    62% { transform: scale(4.2); opacity: 1; }
+    78%, 100% { transform: scale(5.6); opacity: 0; }
+  }
+  @keyframes diveB {
+    0%, 55% { opacity: 0; transform: scale(0.92); filter: blur(8px); }
+    80%, 88% { opacity: 1; transform: scale(1); filter: blur(0); }
+    100% { opacity: 0; transform: scale(1); filter: blur(0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .demo .a, .demo .b { animation: none; } .demo .b { opacity: 0.5; } }
+
+  /* the actual seam ingredients */
+  .crop { position: relative; aspect-ratio: 1 / 1; overflow: hidden; }
+  .crop img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(5.6); transform-origin: 37% 70%; }
+  .arrowline { display: flex; align-items: center; justify-content: center; font: 300 2.4rem/1 var(--serif); color: var(--accent); }
+
+  /* resolution comparison — both panels are REAL renderings of our files */
+  .zoomband { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
+  .zoomband img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .soft img { transform: scale(6); transform-origin: 50.5% 61.5%; }
+  .sharp img { transform: scale(2.1); transform-origin: 50.5% 61.5%; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 3vh; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 0.9rem 1rem; border-bottom: 1px solid rgba(233,230,223,0.09); vertical-align: top; }
+  th { font: 500 0.6875rem/1.4 var(--sans); text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted); }
+  td:first-child { color: var(--muted); }
+  td strong { color: var(--accent); font-weight: 500; }
+  .videoblock video { width: 100%; }
+  .pill { display: inline-flex; align-items: center; gap: 0.55em; font: 500 0.8125rem/1 var(--sans); text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink); border: 1px solid rgba(233,230,223,0.28); border-radius: 999px; padding: 0.9em 2.2em; text-decoration: none; margin-top: 3vh; }
+  .pill:hover { border-color: var(--accent); }
+  footer { margin-top: 14vh; padding-top: 3rem; border-top: 1px solid var(--hairline); text-align: center; }
+  footer .wm { font: 300 clamp(2rem, 6vw, 4rem)/1 var(--serif); letter-spacing: 0.24em; color: transparent; -webkit-text-stroke: 1px rgba(233,230,223,0.22); }
+  footer p { font-size: 0.75rem; color: var(--muted); margin-top: 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow"><b>FOR GAVIN</b> &nbsp;·&nbsp; THE NEXT PASS ON THE FRACTAL DIVE</p>
+  <h1>Right now the dive is an illusion. Next, it <em>becomes</em>.</h1>
+  <p class="lead">The site you just scrolled runs on choreography: two photographs, a zoom, a mask, a crossfade. It looks good — but at the seam between artworks, your eye can catch the trick. This page shows exactly what changes when we hand those seams to Higgsfield's Seedance 2.0 and upscale the masters to 4K.</p>
+  <a class="pill" href="index.html">Re-enter the current dive &rarr;</a>
+
+  <section>
+    <p class="eyebrow">01 · TODAY</p>
+    <h2>What the transition really is: two stills, cross-dissolving.</h2>
+    <div class="panel demo">
+      <img class="b" src="media/img/files__2BFDD372-EA73-4D8C-9A52-015EA17057F2.webp" alt="Midnight Grandfather Clock fading in beneath the zoom">
+      <img class="a" src="media/img/products__IN-OUR-MIDST-WEB_9fc3cd6b-b87b-4639-86e9-ee89e606ca71.webp" alt="In Our Midst, zooming toward its painted detail">
+    </div>
+    <p class="cap">A live re-creation of the site's actual seam — In Our Midst diving into the Midnight Grandfather Clock, looping. Watch the moment of handoff: the paint goes soft as the zoom deepens, and for a beat, two unrelated images overlap. Nothing truly transforms — one image dissolves while another fades in.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">02 · WITH SEEDANCE 2.0</p>
+    <h2>The seam becomes a single painted <em>shot</em>.</h2>
+    <p class="lead">For each transition we give the model two anchors: the <strong>exact detail region</strong> the camera dives into, and the <strong>next artwork's full frame</strong>. Seedance then paints the five seconds in between — the camera keeps pushing through the brushwork, strokes flow and re-form, these maze-pods literally unfurl into the clock's mandalas. Every frame is synthesized crisp at 1080p. There is no crossfade because there is no cut: the first frame <em>is</em> the detail below, the last frame <em>is</em> the clock.</p>
+    <div class="duo">
+      <div>
+        <div class="panel crop">
+          <img src="media/img/products__IN-OUR-MIDST-WEB_9fc3cd6b-b87b-4639-86e9-ee89e606ca71.webp" alt="The exact painted detail region of In Our Midst used as the morph's start frame">
+        </div>
+        <p class="cap">Start frame — the actual dive-target detail of In Our Midst (this crop is defined in the site today).</p>
+      </div>
+      <div>
+        <div class="panel" style="aspect-ratio:1/1;overflow:hidden">
+          <img style="width:100%;height:100%;object-fit:cover" src="media/img/files__2BFDD372-EA73-4D8C-9A52-015EA17057F2.webp" alt="Midnight Grandfather Clock — the morph's end frame">
+        </div>
+        <p class="cap">End frame — the Midnight Grandfather Clock. Seedance paints everything between the two.</p>
+      </div>
+    </div>
+    <div class="duo">
+      <div class="videoblock">
+        <div class="panel"><video src="media/video/midnight-grandfather-clock-c545f9d8.mp4" muted loop playsinline autoplay></video></div>
+        <p class="cap">And for the kinetic pieces, the morphs are video-referenced: this real footage of the Midnight clock feeds the model, so the pendulum is already swinging as the morph resolves — and the seam lands directly on footage like this.</p>
+      </div>
+      <div>
+        <table>
+          <tr><th></th><th>Today</th><th>With Higgsfield</th></tr>
+          <tr><td>Deep-zoom detail</td><td>upscaled, goes soft</td><td><strong>synthesized, stays crisp</strong></td></tr>
+          <tr><td>The seam</td><td>two stills dissolving</td><td><strong>one continuous shot</strong></td></tr>
+          <tr><td>Motion</td><td>rigid zoom of a flat plane</td><td><strong>camera push; brushwork that flows</strong></td></tr>
+          <tr><td>Continuity</td><td>compositional rhyme</td><td><strong>literal transformation</strong></td></tr>
+          <tr><td>Scroll feel</td><td>scrubbed, reversible</td><td><strong>still scrubbed &amp; reversible</strong></td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">03 · 4K UPSCALING</p>
+    <h2>The dwell moments get their <em>sharpness</em> back.</h2>
+    <div class="duo">
+      <div>
+        <div class="panel zoomband soft"><img src="media/img/files__IMG_8842.webp" alt="Current maximum zoom into the Black and White clock — visibly soft"></div>
+        <p class="cap">Today — this is genuinely what the site renders at maximum zoom into the B&amp;W clock: the freehand Posca linework dissolves into softness.</p>
+      </div>
+      <div>
+        <div class="panel zoomband sharp"><img src="media/img/files__IMG_8842.webp" alt="The same region at native sharpness — approximating the 4K upscale"></div>
+        <p class="cap">With Higgsfield 4K upscaling, the deep zoom holds line-level detail. (Shown here at our file's native sharpness as an approximation — the real 4K output resolves finer still.)</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">04 · THE PLAN</p>
+    <h2>What it takes.</h2>
+    <table>
+      <tr><th>Upgrade</th><th>Scope</th><th>Credits</th></tr>
+      <tr><td>Seedance 2.0 std morphs, 1080p, 5&nbsp;s, scroll-scrubbed</td><td>all 9 seams of the loop</td><td><strong>405</strong></td></tr>
+      <tr><td>4K upscale of the ten dive masters</td><td>10 images</td><td><strong>20</strong></td></tr>
+      <tr><td>Kinetic dwells — real clock &amp; lamp footage inside the dive</td><td>3 chapters</td><td><strong>0</strong> (already filmed)</td></tr>
+      <tr><td>Video upscales (morph clips + dive footage)</td><td>9–14 clips</td><td>priced on first run</td></tr>
+    </table>
+    <p class="cap" style="margin-top:1.4rem">Everything above is preflighted against Higgsfield's live pricing. The current site stays fully functional throughout — morphs swap in one seam at a time, and any seam that comes out weak gets retaken before it ships.</p>
+    <a class="pill" href="index.html">Back to the dive &rarr;</a>
+  </section>
+
+  <footer>
+    <div class="wm">GAVINGER</div>
+    <p>Prepared for Gavin Gerundo · commerce stays on gavinger.com · this page is unlisted</p>
+  </footer>
+</main>
+</body>
+</html>
