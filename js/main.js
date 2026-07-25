@@ -15,6 +15,7 @@
     if (entry && !entry.classList.contains('gone')) {
       entry.classList.add('gone');
       document.documentElement.style.overflow = '';
+      document.dispatchEvent(new CustomEvent('gav:entry-done')); // the film starts here
     }
   }
   if (reduced) {
@@ -54,7 +55,7 @@
       document.body.classList.toggle('cursor-art', overArt);
     });
     document.addEventListener('gav:dive', function (e) {
-      document.body.classList.toggle('cursor-dive', e.detail.zoomT > 0.42);
+      document.body.classList.toggle('cursor-dive', e.detail.zoomT > 0.61);
     });
   }
 
@@ -92,10 +93,9 @@
   });
 
   function scrubToChapter(i) {
-    var st = ScrollTrigger.getById('dive');
-    if (st) {
-      var y = st.start + (st.end - st.start) * ((i + 0.14) / N);
-      window.scrollTo(0, Math.round(y));
+    if (window.GAV_DIVE) {
+      window.scrollTo(0, 0);          // the film plays in the stage at the top
+      window.GAV_DIVE.seek(i);
     } else {
       // reduced motion: chapters are in normal flow
       var layer = document.querySelector('.dive-layer[data-i="' + i + '"]');
@@ -140,27 +140,11 @@
     if (e.key === 'Escape' && !overlay.hidden) closeIndex();
   });
 
-  /* ---------- loop pill: pause at the seam ---------- */
-  var loopPill = document.getElementById('loop-pill');
+  /* ---------- hint fades once the visitor scrolls on ---------- */
   var hint = document.getElementById('dive-hint');
-  var seamTimer = null;
-  document.addEventListener('gav:dive', function (e) {
-    if (hint) hint.style.display = e.detail.progress > 0.02 ? 'none' : '';
-    var inSeam = e.detail.index === N - 1 && e.detail.zoomT > 0.75;
-    if (inSeam) {
-      if (!seamTimer) {
-        seamTimer = setTimeout(function () { loopPill.classList.add('show'); }, 2000);
-      }
-    } else {
-      clearTimeout(seamTimer); seamTimer = null;
-      loopPill.classList.remove('show');
-    }
-  });
-  loopPill.addEventListener('click', function () {
-    loopPill.classList.remove('show');
-    var st = ScrollTrigger.getById('dive');
-    window.scrollTo(0, st ? st.start : 0);
-  });
+  window.addEventListener('scroll', function () {
+    if (hint) hint.style.display = window.scrollY > 40 ? 'none' : '';
+  }, { passive: true });
 
   /* ---------- the workshop keeps its own time ---------- */
   var clockEl = document.getElementById('clock-time');

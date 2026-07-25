@@ -1,14 +1,13 @@
 /* ============================================================
-   GAVINGER — Fractal Dive engine · "Gallery Nocturne"
-   One pinned stage; scroll scrubs a master timeline through the
-   10-piece chain. Per chapter (normalized 0–1):
-     A  DWELL   0.00–0.40  art drifts 1→1.03, wall placard rises
-     B  DIVE    0.40–0.85  camera pushes into the focus detail;
-                           a radial mask swallows the periphery
-     C  RESOLVE 0.85–1.00  the next piece blooms up from beneath,
-                           accent re-lights the room, wordmark pass
-   Chapter 10 resolves back into chapter 1 — the loop.
-   All geometry is function-based + invalidateOnRefresh.
+   GAVINGER — Fractal Dive engine · "Gallery Nocturne" · auto-play
+   The dive is a self-playing film: each chapter dwells on an
+   artwork (placard clickable, hover pauses the film), then the
+   camera dives into a per-piece focus detail and the next piece
+   blooms from beneath. Chapter 10 resolves into chapter 1 and the
+   loop wraps seamlessly. The seam windows are exactly where the
+   Higgsfield morph clips will slot in later.
+     DWELL 0.0–5.5s · DIVE 5.5–9.0s · full loop ≈ 90s
+   Reduced motion: a static gallery, never an autoplaying film.
    ============================================================ */
 (function () {
   'use strict';
@@ -17,7 +16,8 @@
   var N = CHAIN.length;
   if (!N) return;
 
-  var SEG_VH = 2.5;        // scroll-viewports of travel per chapter
+  var SEG = 9;               // seconds per chapter
+  var DWELL = 5.5;           // seconds of placard time
   var stage = document.getElementById('dive');
   var layersHost = document.getElementById('dive-layers');
   var cardsHost = document.getElementById('dive-cards');
@@ -28,7 +28,7 @@
 
   window.__GAV_DEBUG__ = {
     ready: false, mode: 'pending', chainIndex: 0, zoomT: 0,
-    scrollY: 0, sectionId: 'dive', pieces: N, diveProgress: 0
+    scrollY: 0, sectionId: 'dive', pieces: N, diveProgress: 0, paused: false
   };
 
   /* ---------- DOM build ---------- */
@@ -74,10 +74,6 @@
   layers.push(buildLayer(CHAIN[0], N, true)); // loop clone of chapter 1
   var cards = CHAIN.map(buildCard);
 
-  // iOS URL-bar collapse fires innerHeight resizes mid-pin; the stage is
-  // sized in svh, so ignore those and measure the stage itself.
-  ScrollTrigger.config({ ignoreMobileResize: true });
-
   /* ---------- geometry ---------- */
   function coverMetrics(piece) {
     var vw = window.innerWidth, vh = stage.clientHeight || window.innerHeight;
@@ -119,7 +115,7 @@
   if (document.readyState === 'complete') { setTimeout(hydrateAllSoon, 300); }
   else { window.addEventListener('load', function () { setTimeout(hydrateAllSoon, 300); }); }
 
-  /* ---------- settle-tick counter ---------- */
+  /* ---------- settle-tick counter + card/mask bookkeeping ---------- */
   var lastCounter = -1;
   function tickCounter(idx) {
     if (idx === lastCounter) return;
@@ -130,8 +126,6 @@
       gsap.fromTo(railCounter, { y: 7 }, { y: 0, duration: 0.5, ease: 'back.out(1.2)', overwrite: 'auto' });
     }
   }
-
-  /* ---------- card + debug bookkeeping ---------- */
   var activeCard = -1;
   function setActiveCard(i) {
     if (i === activeCard) return;
@@ -139,8 +133,6 @@
     if (i >= 0 && cards[i]) cards[i].classList.add('is-active');
     activeCard = i;
   }
-  // the mask only exists while a layer is actually diving — an idle
-  // full-viewport mask surface is pure compositor waste
   var maskedLayer = -1;
   function setMaskedLayer(i) {
     if (i === maskedLayer) return;
@@ -148,33 +140,14 @@
     if (i >= 0 && layers[i]) layers[i].classList.add('is-diving');
     maskedLayer = i;
   }
-  function onDiveUpdate(self) {
-    var p = self.progress;
-    var idx = Math.min(N - 1, Math.floor(p * N));
-    var zoomT = p * N - idx;
-    var d = window.__GAV_DEBUG__;
-    if (self.isActive) d.sectionId = 'dive';
-    d.chainIndex = idx;
-    d.zoomT = Math.round(zoomT * 1000) / 1000;
-    d.diveProgress = Math.round(p * 1000) / 1000;
-    d.scrollY = window.scrollY;
-    if (railFill) railFill.style.transform = 'scaleY(' + (idx + 1) / N + ')';   // snapped per chapter
-    if (railGlow) railGlow.style.transform = 'scaleY(' + p + ')';               // continuous scrub glow
-    tickCounter(idx);
-    setActiveCard(zoomT < 0.42 ? idx : -1);
-    setMaskedLayer(zoomT >= 0.42 ? idx : -1);
-    document.dispatchEvent(new CustomEvent('gav:dive', { detail: { index: idx, zoomT: zoomT, progress: p } }));
-  }
 
-  /* ---------- master timeline ---------- */
+  /* ---------- the film ---------- */
   var mm = gsap.matchMedia();
 
   mm.add('(prefers-reduced-motion: no-preference)', function () {
     setOrigins();
-    ScrollTrigger.addEventListener('refreshInit', setOrigins);
+    window.addEventListener('resize', setOrigins);
 
-    // stacking: earlier chapters sit ABOVE later ones — the incoming
-    // piece blooms up from beneath the outgoing detail.
     layers.forEach(function (layer, i) {
       gsap.set(layer, { autoAlpha: i === 0 ? 1 : 0, zIndex: layers.length - i });
     });
@@ -182,40 +155,39 @@
     gsap.set(stage, { backgroundColor: CHAIN[0].bg });
     document.documentElement.style.setProperty('--accent', CHAIN[0].accent);
 
-    var tl = gsap.timeline({
-      defaults: { ease: 'none' },
-      scrollTrigger: {
-        id: 'dive',
-        trigger: stage,
-        start: 'top top',
-        end: function () { return '+=' + Math.round(N * (stage.clientHeight || window.innerHeight) * SEG_VH); },
-        pin: true,
-        scrub: true,
-        invalidateOnRefresh: true,
-        onUpdate: onDiveUpdate
-      }
+    var tl = gsap.timeline({ repeat: -1, paused: true, defaults: { ease: 'none' } });
+
+    // wrap reset: every loop iteration starts from a known state.
+    // Visually seamless — the clone (piece 1, scale 1) swaps for layer 0
+    // showing the identical pixels.
+    layers.forEach(function (layer, i) {
+      tl.set(layer, { autoAlpha: i === 0 ? 1 : 0 }, 0);
+      tl.set(layer.querySelector('.dive-zoom'), { scale: 1, x: 0, y: 0 }, 0);
+      tl.set(layer, { '--mr': '150%' }, 0);
     });
 
     CHAIN.forEach(function (piece, i) {
       var out = layers[i], inc = layers[i + 1];
       var outZoom = out.querySelector('.dive-zoom');
       var incPiece = CHAIN[(i + 1) % N];
-      var t0 = i;
+      var t0 = i * SEG;
 
-      // A · DWELL — placard rises, art leans in
+      // DWELL — placard rises, the camera leans in
       tl.fromTo(cards[i], { autoAlpha: 0, y: 24 },
-        { autoAlpha: 1, y: 0, duration: 0.07, ease: 'power1.out' }, t0 + 0.03);
-      tl.to(cards[i], { autoAlpha: 0, y: -24, filter: 'blur(6px)', duration: 0.07, ease: 'power1.in' }, t0 + 0.35);
-      tl.set(cards[i], { filter: 'blur(0px)' }, t0 + 0.43);
-      tl.fromTo(outZoom, { scale: 1, x: 0, y: 0 }, { scale: 1.03, duration: 0.4 }, t0);
+        { autoAlpha: 1, y: 0, duration: 0.9, ease: 'power2.out' }, t0 + 0.35);
+      tl.to(cards[i], { autoAlpha: 0, y: -24, filter: 'blur(6px)', duration: 0.7, ease: 'power1.in' }, t0 + DWELL - 0.8);
+      tl.set(cards[i], { filter: 'blur(0px)' }, t0 + DWELL);
+      tl.fromTo(outZoom, { scale: 1, x: 0, y: 0 },
+        { scale: 1.04, duration: DWELL, ease: 'sine.inOut' }, t0);
 
-      // B · DIVE — one continuous camera push into the focus detail
+      // DIVE — one continuous camera push into the focus detail
       tl.to(outZoom, {
         scale: function () { return zoomScale(piece); },
         x: function () { var tp = targetPoint(piece); return tp.m.vw / 2 - tp.x; },
         y: function () { var tp = targetPoint(piece); return tp.m.vh / 2 - tp.y; },
-        duration: 0.6
-      }, t0 + 0.4);
+        duration: SEG - DWELL,
+        ease: 'power2.in'
+      }, t0 + DWELL);
 
       // the room goes dark around the beam
       tl.fromTo(out, {
@@ -224,32 +196,108 @@
         '--my': function () { var tp = targetPoint(piece); return (tp.y / tp.m.vh * 100) + '%'; }
       }, {
         '--mr': '46%', '--mx': '50%', '--my': '50%',
-        duration: 0.43, ease: 'power1.in'
-      }, t0 + 0.45);
+        duration: 2.7, ease: 'power1.in'
+      }, t0 + DWELL + 0.4);
 
-      // C · RESOLVE — next piece blooms up from beneath
+      // RESOLVE — the next piece blooms up from beneath
+      // (this 1.6s window is where a Higgsfield morph clip will play)
       tl.fromTo(inc, { autoAlpha: 0, scale: 0.92, filter: 'blur(8px)' },
-        { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 0.18, ease: 'power1.inOut' }, t0 + 0.82);
-      tl.to(out, { autoAlpha: 0, duration: 0.08, ease: 'power1.in' }, t0 + 0.92);
-      tl.set(out, { '--mr': '150%' }, t0 + 1);
+        { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 1.6, ease: 'power1.inOut' }, t0 + SEG - 1.6);
+      tl.to(out, { autoAlpha: 0, duration: 0.7, ease: 'power1.in' }, t0 + SEG - 0.7);
+      tl.set(out, { '--mr': '150%' }, t0 + SEG);
 
       // the room re-lights in the incoming piece's color
-      tl.to('html', { '--accent': incPiece.accent, duration: 0.12 }, t0 + 0.85);
-      tl.to(stage, { backgroundColor: incPiece.bg, duration: 0.12 }, t0 + 0.85);
+      tl.to('html', { '--accent': incPiece.accent, duration: 1.1, ease: 'sine.inOut' }, t0 + SEG - 1.4);
+      tl.to(stage, { backgroundColor: incPiece.bg, duration: 1.1, ease: 'sine.inOut' }, t0 + SEG - 1.4);
 
       // etched-glass wordmark pass between rooms
       tl.fromTo(wordmark, { autoAlpha: 0, scale: 0.94, yPercent: 2 },
-        { autoAlpha: 0.07, scale: 1.03, yPercent: 0, duration: 0.17, ease: 'sine.out' }, t0 + 0.55);
-      tl.to(wordmark, { autoAlpha: 0, scale: 1.12, yPercent: -2, duration: 0.23, ease: 'sine.in' }, t0 + 0.72);
+        { autoAlpha: 0.07, scale: 1.03, yPercent: 0, duration: 1.4, ease: 'sine.out' }, t0 + DWELL + 0.9);
+      tl.to(wordmark, { autoAlpha: 0, scale: 1.12, yPercent: -2, duration: 1.6, ease: 'sine.in' }, t0 + DWELL + 2.4);
     });
 
-    window.__GAV_DEBUG__.mode = 'dive';
+    /* ---------- playback state + public API ---------- */
+    var holdCard = false, holdTab = false;
+    function syncPlayState() {
+      var shouldPause = holdCard || holdTab;
+      if (shouldPause && !tl.paused()) tl.pause();
+      if (!shouldPause && tl.paused()) tl.play();
+      window.__GAV_DEBUG__.paused = tl.paused();
+    }
+    // hovering (or keyboard-focusing) a placard holds the film for the click
+    cardsHost.addEventListener('pointerenter', function (e) {
+      if (e.target.closest && e.target.closest('.dive-card')) { holdCard = true; syncPlayState(); }
+    }, true);
+    cardsHost.addEventListener('pointerleave', function (e) {
+      if (e.target.closest && e.target.closest('.dive-card')) { holdCard = false; syncPlayState(); }
+    }, true);
+    cardsHost.addEventListener('focusin', function () { holdCard = true; syncPlayState(); });
+    cardsHost.addEventListener('focusout', function () { holdCard = false; syncPlayState(); });
+    document.addEventListener('visibilitychange', function () {
+      holdTab = document.hidden; syncPlayState();
+    });
+
+    function seek(i) {
+      tl.seek(((i % N) + N) % N * SEG + 0.4);
+      holdCard = false; syncPlayState();
+    }
+    window.GAV_DIVE = {
+      timeline: tl,
+      seek: seek,
+      next: function () { seek(Math.floor(tl.time() / SEG) + 1); },
+      prev: function () {
+        var t = tl.time(), idx = Math.floor(t / SEG);
+        // early in a chapter, "prev" means the previous chapter
+        seek(t - idx * SEG < 1.6 ? idx - 1 : idx);
+      }
+    };
+    var prevBtn = document.getElementById('dive-prev');
+    var nextBtn = document.getElementById('dive-next');
+    if (prevBtn) prevBtn.addEventListener('click', function () { window.GAV_DIVE.prev(); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { window.GAV_DIVE.next(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      var overlay = document.getElementById('index-overlay');
+      if (overlay && !overlay.hidden) return;
+      if (e.key === 'ArrowRight') window.GAV_DIVE.next(); else window.GAV_DIVE.prev();
+    });
+
+    /* ---------- per-tick bookkeeping ---------- */
+    tl.eventCallback('onUpdate', function () {
+      var t = tl.time();
+      var idx = Math.min(N - 1, Math.floor(t / SEG));
+      var zoomT = (t - idx * SEG) / SEG;
+      var d = window.__GAV_DEBUG__;
+      d.chainIndex = idx;
+      d.zoomT = Math.round(zoomT * 1000) / 1000;
+      d.diveProgress = Math.round(tl.progress() * 1000) / 1000;
+      d.scrollY = window.scrollY;
+      if (railFill) railFill.style.transform = 'scaleY(' + (idx + 1) / N + ')';
+      if (railGlow) railGlow.style.transform = 'scaleY(' + tl.progress() + ')';
+      tickCounter(idx);
+      var dwellT = DWELL / SEG;
+      setActiveCard(zoomT < dwellT ? idx : -1);
+      setMaskedLayer(zoomT >= dwellT ? idx : -1);
+      document.dispatchEvent(new CustomEvent('gav:dive', { detail: { index: idx, zoomT: zoomT, progress: tl.progress() } }));
+    });
+
+    // the film starts when the entry sequence finishes (failsafe below)
+    var started = false;
+    function startFilm() { if (!started) { started = true; syncPlayState(); tl.play(0); } }
+    document.addEventListener('gav:entry-done', startFilm);
+    setTimeout(startFilm, 5000);
+
+    window.__GAV_DEBUG__.mode = 'autoplay';
     window.__GAV_DEBUG__.ready = true;
 
-    return function () { ScrollTrigger.removeEventListener('refreshInit', setOrigins); };
+    return function () {
+      window.removeEventListener('resize', setOrigins);
+      tl.kill();
+      delete window.GAV_DIVE;
+    };
   });
 
-  /* ---------- reduced motion: the collection, never the dive ---------- */
+  /* ---------- reduced motion: the collection, never the film ---------- */
   mm.add('(prefers-reduced-motion: reduce)', function () {
     document.body.classList.add('reduced-motion');
     document.documentElement.style.setProperty('--accent', CHAIN[0].accent);
@@ -258,10 +306,9 @@
       gsap.set(layer, { clearProps: 'all' });
       layer.querySelector('.dive-zoom').style.transformOrigin = '';
       layer.classList.remove('is-diving');
-      // each placard sits with its artwork, not in a separate stack below
       if (i < N) layer.appendChild(cards[i]);
     });
-    layers[N].style.display = 'none'; // the loop clone would read as a duplicate
+    layers[N].style.display = 'none';
     cards.forEach(function (card) { card.classList.add('is-active'); });
     if (railCounter) railCounter.textContent = '01 / ' + pad(N);
     window.__GAV_DEBUG__.mode = 'static';
@@ -271,7 +318,7 @@
       layers[N].style.display = '';
       cards.forEach(function (card) {
         card.classList.remove('is-active');
-        cardsHost.appendChild(card); // restore original card stack + order
+        cardsHost.appendChild(card);
       });
       activeCard = -1;
       lastCounter = -1;
