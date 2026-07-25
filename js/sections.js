@@ -16,14 +16,17 @@
   function hasTag(p, t) { return (p.tags || []).indexOf(t) !== -1; }
 
   /* ---------- 02 · THE TIMELESS COLLECTION ---------- */
-  // Hand-curated hang: no two same-series or similar-palette dials adjacent
-  // (rainbow > red star > gold gothic > blue spike > orange rose > silver
-  //  circuit > green star > purple rose > yellow spike > purple web >
-  //  rainbow rose > green circuit)
+  // Hand-curated hang from the VIDEO frames (what the rail actually shows).
+  // Three dials are rainbow-dichroic mirrors in motion — Convergence II,
+  // Asanoah II, Windows III — pinned to positions 1 / 7 / 12; all other
+  // sibling looks (sunbursts, aliens, warm gothics) separated too:
+  // rainbow > gold gothic > ice-blue spike > green lattice > orange rose >
+  // silver circuit > rainbow > purple gothic > yellow spike > green circuit >
+  // purple web > rainbow
   var RAIL_ORDER = [
-    'convergence-ii', 'asanoah-ii-1', 'windows-iv', 'asanoah-ii',
-    'windows-ii', 'alien-ii', 'asanoah-i-1', 'windows-1',
-    'asanoah-i', 'convergence-i', 'windows-iii', 'alien-i'
+    'convergence-ii', 'windows-iv', 'asanoah-ii', 'asanoah-i-1',
+    'windows-ii', 'alien-ii', 'asanoah-ii-1', 'windows-1',
+    'asanoah-i', 'alien-i', 'convergence-i', 'windows-iii'
   ];
   var clocks = RAIL_ORDER.map(function (h) {
     return DATA.find(function (p) { return p.h === h; });
