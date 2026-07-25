@@ -396,14 +396,18 @@ body.reduced-motion .grid-item { opacity: 1; transform: none; }
 #mural-figure img { width: 100%; height: 100%; object-fit: cover; }
 .over-bleed { position: relative; z-index: 2; padding: 0 clamp(1.4rem, 6vw, 7rem) 12vh; }
 
-/* 06 · about */
+/* 06 · about — presented at 1.5× the standard chapter scale */
 .about-grid {
   display: grid;
-  grid-template-columns: minmax(280px, 420px) 1fr;
-  gap: clamp(2rem, 6vw, 6rem);
+  grid-template-columns: minmax(280px, 630px) 1fr;
+  gap: clamp(2rem, 7vw, 7rem);
   align-items: center;
 }
 #about-portrait img { filter: saturate(0.92); }
+#about .eyebrow { font-size: 1.03rem; }
+#about .headline { font-size: clamp(4.125rem, 9.75vw, 9rem); }
+#about .support { font-size: 1.4rem; }
+#about .pill { font-size: 1.22rem; }
 
 /* 07 · contact / footer */
 #contact { padding-bottom: 6vh; }
