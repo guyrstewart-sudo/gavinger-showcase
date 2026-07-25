@@ -171,14 +171,46 @@
     'Sticker': 'Sticker'
   };
   var mosaic = document.getElementById('mosaic');
-  flat.forEach(function (p) {
+  var tiles = flat.map(function (p) {
     var a = document.createElement('a');
     a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
     a.setAttribute('aria-label', p.t + ' — view on gavinger.com');
     a.innerHTML =
       '<img loading="lazy" decoding="async" style="aspect-ratio:' + p.im[0].w + '/' + p.im[0].h + '" src="' + p.im[0].s + '" alt="' + esc(p.t) + ' — ' + KIND_LABEL[p.ty] + ' by Gavinger">' +
       '<span class="m-tip">' + esc(p.t) + ' · ' + KIND_LABEL[p.ty] + ' · ' + money(p.p) + '</span>';
-    mosaic.appendChild(a);
+    return { el: a, ratio: p.im[0].h / p.im[0].w };
+  });
+
+  // balanced masonry: each tile drops into the currently-shortest column,
+  // so the wall's bottom edge stays level (CSS columns leave ragged tails)
+  function mosaicColCount() {
+    var w = window.innerWidth;
+    return w > 1100 ? 5 : w > 860 ? 4 : w > 560 ? 3 : 2;
+  }
+  var lastCols = 0;
+  function layoutMosaic() {
+    var n = mosaicColCount();
+    if (n === lastCols) return;
+    lastCols = n;
+    mosaic.innerHTML = '';
+    var cols = [], heights = [];
+    for (var i = 0; i < n; i++) {
+      var c = document.createElement('div');
+      c.className = 'm-col';
+      mosaic.appendChild(c);
+      cols.push(c); heights.push(0);
+    }
+    tiles.forEach(function (t) {
+      var k = heights.indexOf(Math.min.apply(null, heights));
+      cols[k].appendChild(t.el);
+      heights[k] += t.ratio;
+    });
+  }
+  layoutMosaic();
+  var mosaicResizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(mosaicResizeTimer);
+    mosaicResizeTimer = setTimeout(layoutMosaic, 180);
   });
 
   /* ---------- reserve heights for late-loading imagery ---------- */
