@@ -16,9 +16,18 @@
   function hasTag(p, t) { return (p.tags || []).indexOf(t) !== -1; }
 
   /* ---------- 02 · THE TIMELESS COLLECTION ---------- */
-  var clocks = DATA.filter(function (p) { return hasTag(p, 'wall clock') && p.im.length; });
-  clocks.sort(function (a, b) { return (b.vi.length - a.vi.length) || (b.p - a.p); });
-  clocks = clocks.slice(0, 12); // the rail ends with the kinetic clocks — the 5 still-only cards are cut
+  // Hand-curated hang: no two same-series or similar-palette dials adjacent
+  // (rainbow > red star > gold gothic > blue spike > orange rose > silver
+  //  circuit > green star > purple rose > yellow spike > purple web >
+  //  rainbow rose > green circuit)
+  var RAIL_ORDER = [
+    'convergence-ii', 'asanoah-ii-1', 'windows-iv', 'asanoah-ii',
+    'windows-ii', 'alien-ii', 'asanoah-i-1', 'windows-1',
+    'asanoah-i', 'convergence-i', 'windows-iii', 'alien-i'
+  ];
+  var clocks = RAIL_ORDER.map(function (h) {
+    return DATA.find(function (p) { return p.h === h; });
+  }).filter(function (p) { return p && p.im.length; });
 
   var track = document.getElementById('timeless-track');
   clocks.forEach(function (p, idx) {
