@@ -117,20 +117,36 @@ a { color: inherit; text-decoration: none; }
 #site-head {
   position: fixed; top: 0; left: 0; right: 0; z-index: 60;
   display: flex; justify-content: space-between; align-items: center;
-  padding: 1rem 2.2rem 1.4rem;
-  background: linear-gradient(rgba(5, 5, 5, 0.72) 40%, rgba(5, 5, 5, 0));
+  gap: clamp(1rem, 2.5vw, 2.4rem);
+  padding: 1rem 2.2rem 1.2rem;
+  background: linear-gradient(rgba(5, 5, 5, 0.78) 45%, rgba(5, 5, 5, 0));
   pointer-events: none;
 }
 #site-head a, #site-head button { pointer-events: auto; }
 #brand {
-  font: 400 2.85rem/1 var(--serif);
-  letter-spacing: 0.28em;
   display: inline-flex; align-items: center;
-  min-height: 44px; padding: 0 0.3em;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
+  min-height: 44px; padding: 0.2em 0;
+  flex: none;
 }
+#brand img { height: 46px; width: auto; filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.6)); }
+/* the Shopify storefront's menu, in Gallery Nocturne white */
+#shop-nav {
+  display: flex; align-items: center;
+  gap: clamp(0.9rem, 1.8vw, 1.7rem);
+  flex-wrap: nowrap;
+  margin-right: auto;
+}
+#shop-nav a {
+  font: 600 0.9rem/1.2 var(--sans);
+  color: var(--ink);
+  white-space: nowrap;
+  padding: 0.7em 0.1em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.65);
+  transition: color 0.25s ease;
+}
+#shop-nav a:hover { color: color-mix(in srgb, var(--accent) 75%, var(--ink)); }
 #index-open {
-  font: 500 2.0625rem/1 var(--sans);
+  font: 500 1.05rem/1 var(--sans);
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--ink);
@@ -138,6 +154,7 @@ a { color: inherit; text-decoration: none; }
   min-height: 44px; min-width: 44px;
   padding: 0.3em 0.2em;
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
+  flex: none;
 }
 #index-close {
   font: 500 1.5rem/1 var(--sans);
@@ -511,15 +528,23 @@ body.reduced-motion #dive-hint { display: none; }
   #index-list { columns: 1; }
   .dive-card { bottom: clamp(4rem, 10vh, 8rem); }
   #rail { right: 0.7rem; }
-  #brand { font-size: 1.9rem; }
-  #index-open { font-size: 1.4rem; }
+  #brand img { height: 34px; }
+}
+@media (max-width: 1420px) {
+  #shop-nav a:nth-child(7) { display: none; }   /* Custom Furniture Inquiry */
+}
+@media (max-width: 1240px) {
+  #shop-nav a:nth-child(4), #shop-nav a:nth-child(6) { display: none; } /* Accessories, Clothing */
+}
+@media (max-width: 1050px) {
+  #shop-nav { display: none; }                   /* logo + INDEX only */
 }
 @media (max-width: 560px) {
   .grid-item, .grid-item:nth-child(6n+1), .grid-item:nth-child(6n+3),
   .grid-item:nth-child(6n+4), .grid-item:nth-child(6n+6) { grid-column: span 12; }
-  #site-head { padding: 1rem 1.4rem 1.2rem; }
-  #brand { font-size: 1.5rem; }
-  #index-open { font-size: 1.1rem; }
+  #site-head { padding: 0.9rem 1.4rem 1.1rem; }
+  #brand img { height: 28px; }
+  #index-open { font-size: 0.95rem; }
   .clock-card { width: 74vw; }
   .dive-card .dive-line { display: none; }
   .dive-card .colophon { display: none; }
