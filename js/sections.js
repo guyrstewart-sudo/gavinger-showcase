@@ -18,6 +18,7 @@
   /* ---------- 02 · THE TIMELESS COLLECTION ---------- */
   var clocks = DATA.filter(function (p) { return hasTag(p, 'wall clock') && p.im.length; });
   clocks.sort(function (a, b) { return (b.vi.length - a.vi.length) || (b.p - a.p); });
+  clocks = clocks.slice(0, 12); // the rail ends with the kinetic clocks — the 5 still-only cards are cut
 
   var track = document.getElementById('timeless-track');
   clocks.forEach(function (p, idx) {
