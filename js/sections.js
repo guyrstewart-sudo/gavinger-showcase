@@ -38,7 +38,7 @@
     var media = '<img loading="' + (idx < 4 ? 'eager' : 'lazy') + '" decoding="async" src="' +
       p.im[0].s + '" alt="' + esc(p.t) + ' — hand-painted wall clock">';
     if (p.vi.length) {
-      media += '<video class="kinetic" muted loop playsinline preload="none" src="' + p.vi[0].v +
+      media += '<video class="kinetic" muted loop playsinline preload="metadata" src="' + p.vi[0].v +
         '" aria-hidden="true" tabindex="-1"></video>';
     }
     card.innerHTML =
@@ -48,10 +48,29 @@
     track.appendChild(card);
   });
 
+  // start a muted loop and keep trying until the buffer allows it — the
+  // clocks must ALREADY be ticking when they scroll into the frame
+  function playVid(v) {
+    v.dataset.wantPlay = '1';
+    v.play().then(function () { v.classList.add('is-playing'); }).catch(function () {});
+    if (!v.dataset.retryBound) {
+      v.dataset.retryBound = '1';
+      v.addEventListener('canplay', function () {
+        if (v.dataset.wantPlay === '1' && v.paused) {
+          v.play().then(function () { v.classList.add('is-playing'); }).catch(function () {});
+        }
+      });
+    }
+  }
+  function stopVid(v) {
+    v.dataset.wantPlay = '0';
+    v.pause(); v.classList.remove('is-playing');
+  }
+
   var pinWrap = document.getElementById('timeless-pin');
   mm.add('(prefers-reduced-motion: no-preference)', function () {
     if (!track.children.length) return;
-    var scrollTween = gsap.to(track, {
+    gsap.to(track, {
       x: function () { return Math.min(0, pinWrap.clientWidth - track.scrollWidth - 48); },
       ease: 'none',
       scrollTrigger: {
@@ -64,23 +83,27 @@
         invalidateOnRefresh: true
       }
     });
-    // play only the clocks that are actually passing through the frame
-    Array.prototype.forEach.call(track.querySelectorAll('video'), function (v) {
-      ScrollTrigger.create({
-        trigger: v.closest('.clock-card'),
-        containerAnimation: scrollTween,
-        start: 'left 110%',
-        end: 'right -10%',
-        onToggle: function (self) {
-          if (self.isActive) { v.classList.add('is-playing'); v.play().catch(function () {}); }
-          else { v.pause(); v.classList.remove('is-playing'); }
-        }
-      });
+    var railVids = Array.prototype.slice.call(track.querySelectorAll('video'));
+    // the first cards of the rail start ticking the moment the page settles…
+    var warmTimer = setTimeout(function () { railVids.slice(0, 4).forEach(playVid); }, 1200);
+    // …the rest wind up while the visitor is still up in the dive
+    ScrollTrigger.create({
+      trigger: '#timeless',
+      start: 'top 600%',
+      once: true,
+      onEnter: function () { railVids.forEach(playVid); }
+    });
+    // and everything rests once the section is far behind
+    ScrollTrigger.create({
+      trigger: '#timeless',
+      start: 'top 250%',
+      end: 'bottom -150%',
+      onLeave: function () { railVids.forEach(stopVid); },
+      onEnterBack: function () { railVids.forEach(playVid); }
     });
     return function () {
-      Array.prototype.forEach.call(track.querySelectorAll('video'), function (v) {
-        v.pause(); v.classList.remove('is-playing');
-      });
+      clearTimeout(warmTimer);
+      railVids.forEach(stopVid);
     };
   });
   mm.add('(prefers-reduced-motion: reduce)', function () {
@@ -110,7 +133,7 @@
     item.className = 'grid-item';
     var media = '<img loading="lazy" decoding="async" src="' + p.im[0].l + '" alt="' + esc(p.t) + ' — hand-painted funktional furniture">';
     if (p.vi.length) {
-      media += '<video class="kinetic" muted loop playsinline preload="none" src="' + p.vi[0].v +
+      media += '<video class="kinetic" muted loop playsinline preload="metadata" src="' + p.vi[0].v +
         '" aria-hidden="true" tabindex="-1"></video>';
     }
     item.innerHTML =
@@ -131,18 +154,15 @@
     Array.prototype.forEach.call(grid.querySelectorAll('video'), function (v) {
       ScrollTrigger.create({
         trigger: v.closest('.grid-item'),
-        start: 'top 95%',
-        end: 'bottom 5%',
+        start: 'top 180%',       // wind up well before entering the frame
+        end: 'bottom -80%',
         onToggle: function (self) {
-          if (self.isActive) { v.classList.add('is-playing'); v.play().catch(function () {}); }
-          else { v.pause(); v.classList.remove('is-playing'); }
+          if (self.isActive) { playVid(v); } else { stopVid(v); }
         }
       });
     });
     return function () {
-      Array.prototype.forEach.call(grid.querySelectorAll('video'), function (v) {
-        v.pause(); v.classList.remove('is-playing');
-      });
+      Array.prototype.forEach.call(grid.querySelectorAll('video'), stopVid);
     };
   });
   mm.add('(prefers-reduced-motion: reduce)', function () {
@@ -156,7 +176,20 @@
 
   /* ---------- 04 · ORIGINALS & PRINTS mosaic ---------- */
   var FLAT_TYPES = ['Original Art', 'Posters, Prints, & Visual Artwork', 'Gonzodiac Prints', 'Deeper Depths', 'Tapestry', 'Sticker'];
-  var flat = DATA.filter(function (p) { return FLAT_TYPES.indexOf(p.ty) !== -1 && p.im.length; });
+  // one tile per artwork (visually-verified duplicates): where the original
+  // already stars in the dive, the wall keeps its print; otherwise the wall
+  // keeps the original and drops the print
+  var MOSAIC_EXCLUDE = [
+    'in-our-midst-original-art-on-canvas',            // dive chapter 01 — print stays
+    'labyrinth-original-art-on-canvas',               // dive chapter 05 — print stays
+    'a-moment-of-transparency-original-art-on-canvas',// dive chapter 06 — print stays
+    'primordial-reverie-framed-original-art-on-canvas',// dive chapter 07 — print stays
+    'ex-uno-plures',                                  // print — original stays
+    'kinetic'                                         // print — original stays
+  ];
+  var flat = DATA.filter(function (p) {
+    return FLAT_TYPES.indexOf(p.ty) !== -1 && p.im.length && MOSAIC_EXCLUDE.indexOf(p.h) === -1;
+  });
   // originals first, then series order as harvested
   flat.sort(function (a, b) {
     return (FLAT_TYPES.indexOf(a.ty) - FLAT_TYPES.indexOf(b.ty)) || (b.p - a.p);
