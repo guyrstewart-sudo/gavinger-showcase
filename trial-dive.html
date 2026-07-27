@@ -12,242 +12,47 @@
     --serif:'Cormorant', Georgia, serif; --sans:'Instrument Sans', system-ui, sans-serif; }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:#000; color:var(--ink); font-family:var(--sans); overflow:hidden; height:100vh; }
-  #stage { position:fixed; inset:0; background:#000; }
-  .layer { position:absolute; inset:0; opacity:0; overflow:hidden; background:#000; }
-  .medium { position:absolute; inset:0; width:100%; height:100%; will-change:transform; }
-  .fit-cover .medium { object-fit:cover; }
-  .fit-plate .medium { object-fit:contain; }
-  #caption {
-    position:fixed; left:clamp(1.4rem,5vw,4rem); bottom:clamp(1.6rem,6vh,3.5rem); z-index:20;
-    opacity:0; transition:opacity 1.2s ease; max-width:80vw; pointer-events:none;
-  }
-  #caption .eyebrow { font:500 .6875rem/1 var(--sans); letter-spacing:.32em; text-transform:uppercase; color:var(--accent); text-shadow:0 1px 12px rgba(0,0,0,.9); }
-  #caption h2 { font:300 clamp(1.6rem,3.4vw,2.6rem)/1.1 var(--serif); margin-top:.5em; text-shadow:0 2px 24px rgba(0,0,0,.85); }
-  #begin, #replay {
-    position:fixed; inset:0; z-index:30; display:grid; place-items:center;
+  #film { position:fixed; inset:0; width:100%; height:100%; object-fit:contain; background:#000; }
+  #overlay {
+    position:fixed; inset:0; z-index:10; display:grid; place-items:center;
     background:rgba(0,0,0,.9); cursor:pointer; border:0; color:var(--ink);
+    transition:opacity .8s ease;
   }
+  #overlay.gone { opacity:0; pointer-events:none; }
   .inner { text-align:center; }
   .wm { font:300 clamp(2rem,6vw,4.5rem)/1 var(--serif); letter-spacing:.22em; color:transparent; -webkit-text-stroke:1px rgba(233,230,223,.35); }
   .pill {
     display:inline-block; margin-top:2rem; font:500 .8125rem/1 var(--sans); letter-spacing:.14em;
     text-transform:uppercase; color:var(--ink); border:1px solid rgba(233,230,223,.35);
-    border-radius:999px; padding:.9em 2.4em; background:transparent; transition:opacity .4s;
+    border-radius:999px; padding:.9em 2.4em; background:transparent;
   }
-  #begin.loading .pill { opacity:.35; pointer-events:none; }
-  #replay { display:none; }
   .note { display:block; margin-top:1.2rem; font:italic 400 .85rem/1.5 var(--serif); color:var(--muted); }
+  #foot {
+    position:fixed; left:50%; bottom:1.2rem; transform:translateX(-50%); z-index:5;
+    font:500 .625rem/1 var(--sans); letter-spacing:.32em; text-transform:uppercase;
+    color:var(--muted); opacity:.7; pointer-events:none;
+  }
 </style>
 </head>
 <body>
-<div id="stage"></div>
-<div id="caption"><p class="eyebrow" id="cap-eyebrow"></p><h2 id="cap-title"></h2></div>
-<button id="begin" class="loading"><span class="inner"><span class="wm">GAVINGER</span><br><span class="pill" id="begin-pill">Preparing the room&hellip;</span><span class="note">4K trial &middot; four of ten seams &middot; about one minute &middot; best fullscreen</span></span></button>
-<button id="replay"><span class="inner"><span class="wm">GAVINGER</span><br><span class="pill">Replay &orarr;</span></span></button>
-
-<script src="js/vendor/gsap.min.js"></script>
+<video id="film" playsinline preload="auto" loop muted></video>
+<p id="foot">GAVINGER · THE FRACTAL DIVE · 4K TRIAL — ONE CONTINUOUS FILM</p>
+<button id="overlay"><span class="inner"><span class="wm">GAVINGER</span><br><span class="pill">Begin the dive &rarr;</span><span class="note">one continuous film &middot; four of ten seams &middot; 59 seconds &middot; loops &middot; best fullscreen</span></span></button>
 <script>
 (function () {
-  'use strict';
-  var stage = document.getElementById('stage');
-  var capBox = document.getElementById('caption');
-  var capE = document.getElementById('cap-eyebrow');
-  var capT = document.getElementById('cap-title');
-
-  /* Steps. Boundaries are either:
-     - continuous: the zoom's final frame is geometry-matched to the next
-       clip's first frame (aspect-corrected), and the crossfade overlaps
-       the tail of the motion — a film dissolve inside movement;
-     - dip: a deliberate half-second of black between unrelated chapters.
-     zoom:{cx,cy,size,dur} uses the dive engine's cover math; size is the
-     region's width fraction of the displayed image; size:1 = pure pan. */
-  var SEQ = [
-    { src: 'media/img/products__IN-OUR-MIDST-WEB_9fc3cd6b-b87b-4639-86e9-ee89e606ca71.webp',
-      kind: 'img', fit: 'cover', hold: 2.5, xfade: 1.0,
-      zoom: { cx: 0.37, cy: 0.70, size: 0.18, dur: 5.5 },
-      cap: ['01 · IN OUR MIDST — $27,000', 'The dive begins inside the painting'] },
-    { src: 'media/trial/seam1.mp4', kind: 'vid', fit: 'cover', xfade: 0.7,
-      cap: ['SEAM · MAZE INTO MIDNIGHT', 'Generated 4K transformation'] },
-    { src: 'media/trial/midnight-4k.mp4', kind: 'vid', fit: 'plate', hold: 6.5, xfade: 1.2,
-      zoom: { cx: 0.50, cy: 0.60, size: 0.55, dur: 4.5 },
-      cap: ['02 · MIDNIGHT GRANDFATHER CLOCK — $17,000', 'Real 4K footage — diving into the pendulum window'] },
-    { src: 'media/trial/seam2.mp4', kind: 'vid', fit: 'cover', xfade: 0.8,
-      cap: ['SEAM · DRAWN FROM DARKNESS', 'Generated 4K — footage into footage'] },
-    { src: 'media/trial/bw-4k.mp4', kind: 'vid', fit: 'cover', hold: 6.5, dip: true,
-      cap: ['03 · BLACK & WHITE GRANDFATHER CLOCK — $12,000', 'Real footage, 4K upscaled'] },
-    { src: 'media/img/products__PILGRIMAGE-WEB.webp',
-      kind: 'img', fit: 'cover', hold: 2.5, xfade: 1.0,
-      zoom: { cx: 0.50, cy: 0.38, size: 0.24, dur: 5.0 },
-      cap: ['05 · LABYRINTH — $9,000', 'Original on canvas'] },
-    { src: 'media/trial/seam5.mp4', kind: 'vid', fit: 'cover', xfade: 0.7,
-      cap: ['SEAM · BECOMING TRANSPARENT', 'Generated 4K transformation'] },
-    { src: 'media/img/products__A-Moment-of-Transparency-WEB_3b5c90f0-26cc-4cd0-8b2e-39f061263354.webp',
-      kind: 'img', fit: 'plate', hold: 4.5, xfade: 1.2, bg: '#0b0814',
-      cap: ['06 · A MOMENT OF TRANSPARENCY — $8,500', 'Original on canvas'] },
-    { src: 'media/trial/echo-4k.mp4', kind: 'vid', fit: 'cover', hold: 4.5, dip: true, xfade: 1.0,
-      zoom: { cx: 0.50, cy: 0.62, size: 1.0, dur: 3.0 },
-      cap: ['10 · ECHO — $5,500', 'Real 4K footage — settling on the grille'] },
-    { src: 'media/trial/seam10.mp4', kind: 'vid', fit: 'cover', xfade: 0.7,
-      cap: ['SEAM · GRILLE TO GALAXY', 'Generated 4K — the loop closes'] },
-    { src: 'media/img/products__IN-OUR-MIDST-WEB_9fc3cd6b-b87b-4639-86e9-ee89e606ca71.webp',
-      kind: 'img', fit: 'cover', hold: 5.0, xfade: 1.2,
-      cap: ['01 · IN OUR MIDST', 'The finite reveals the infinite'] },
-  ];
-
-  SEQ.forEach(function (s) {
-    var layer = document.createElement('div');
-    layer.className = 'layer fit-' + s.fit;
-    if (s.bg) layer.style.background = s.bg;
-    var el;
-    if (s.kind === 'img') {
-      el = document.createElement('img');
-      el.src = s.src; el.alt = '';
-    } else {
-      el = document.createElement('video');
-      el.muted = true; el.playsInline = true; el.preload = 'auto';
-      el.src = s.src;
-      el.addEventListener('error', function () { s.failed = true; });
-    }
-    el.className = 'medium';
-    layer.appendChild(el);
-    stage.appendChild(layer);
-    s.layer = layer; s.el = el;
+  var film = document.getElementById('film');
+  var overlay = document.getElementById('overlay');
+  // serve the 4K master to screens that can use it, 1080p elsewhere
+  var big = (screen.width * (devicePixelRatio || 1)) >= 2400;
+  film.src = big ? 'media/trial/film-4k.mp4' : 'media/trial/film-1080.mp4';
+  overlay.addEventListener('click', function () {
+    overlay.classList.add('gone');
+    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){});
+    film.play().catch(function () {});
   });
-
-  function nat(s) {
-    if (s.kind === 'img') return { w: s.el.naturalWidth || 1600, h: s.el.naturalHeight || 900 };
-    return { w: s.el.videoWidth || 1080, h: s.el.videoHeight || 1920 };
-  }
-  /* Land the region (cx,cy) centered and width-filling — corrected for how
-     the NEXT 16:9 clip will be cover-cropped in this viewport, so the
-     dissolve happens between matching frames at any aspect ratio. */
-  function zoomVals(s) {
-    var vw = innerWidth, vh = innerHeight, n = nat(s);
-    var s0 = (s.fit === 'cover') ? Math.max(vw / n.w, vh / n.h) : Math.min(vw / n.w, vh / n.h);
-    var dw = n.w * s0, dh = n.h * s0;
-    var ox = (vw - dw) / 2, oy = (vh - dh) / 2;
-    var aspectCorr = Math.min(1, (vw / vh) / (16 / 9));
-    var effSize = s.zoom.size * aspectCorr;
-    var px = ox + s.zoom.cx * dw, py = oy + s.zoom.cy * dh;
-    var Z = Math.max(1, vw / (effSize * dw));
-    return { origin: px + 'px ' + py + 'px', scale: Z, x: vw / 2 - px, y: vh / 2 - py };
-  }
-
-  var idx = -1, runToken = 0;
-  function schedule(delay, fn) {
-    var token = runToken;
-    gsap.delayedCall(Math.max(0.05, delay), function () { if (token === runToken) fn(); });
-  }
-  function next() {
-    idx++;
-    while (idx < SEQ.length && SEQ[idx].failed) idx++;
-    if (idx >= SEQ.length) {
-      document.getElementById('replay').style.display = 'grid';
-      capBox.style.opacity = 0;
-      return;
-    }
-    var s = SEQ[idx], prev = SEQ[idx - 1];
-    var xf = s.xfade || 0.6;
-    gsap.set(s.layer, { zIndex: 10 + idx });
-
-    if (s.dip && prev) {
-      // deliberate dip to black between chapters
-      gsap.to(prev.layer, { opacity: 0, duration: 0.55, ease: 'sine.in', onComplete: function () {
-        if (prev.el.tagName === 'VIDEO') prev.el.pause();
-        gsap.set(prev.el, { clearProps: 'transform' });
-      }});
-      gsap.fromTo(s.layer, { opacity: 0 }, { opacity: 1, duration: 0.9, delay: 0.75, ease: 'sine.out' });
-      capBox.style.opacity = 0;
-      schedule(0.8, function () {
-        capE.textContent = s.cap[0]; capT.textContent = s.cap[1];
-        capBox.style.opacity = 1;
-      });
-    } else {
-      // film dissolve, overlapping whatever motion is still finishing
-      gsap.fromTo(s.layer, { opacity: 0 }, { opacity: 1, duration: xf, ease: 'sine.inOut' });
-      if (prev) {
-        gsap.to(prev.layer, { opacity: 0, duration: xf, ease: 'sine.inOut', onComplete: function () {
-          if (prev.el.tagName === 'VIDEO') prev.el.pause();
-          gsap.set(prev.el, { clearProps: 'transform' });
-        }});
-      }
-      capE.textContent = s.cap[0]; capT.textContent = s.cap[1];
-      capBox.style.opacity = 1;
-    }
-
-    var startDelay = (s.dip && prev) ? 0.75 : 0;
-    if (s.el.tagName === 'VIDEO') {
-      try { s.el.currentTime = 0; } catch (e) {}
-      if (startDelay) { schedule(startDelay, function () { s.el.play().catch(function () {}); }); }
-      else { s.el.play().catch(function () {}); }
-    }
-
-    if (s.zoom) {
-      var hold = (s.hold || 0) + startDelay;
-      var v = zoomVals(s);
-      gsap.set(s.el, { transformOrigin: v.origin, scale: 1, x: 0, y: 0 });
-      gsap.timeline()
-        .to(s.el, { scale: 1.04, duration: hold, ease: 'sine.inOut' }, 0)
-        .to(s.el, { scale: v.scale, x: v.x, y: v.y, duration: s.zoom.dur, ease: 'power2.inOut' }, hold);
-      // the next clip's dissolve begins while this camera is still moving
-      var nx = SEQ[idx + 1] ? (SEQ[idx + 1].xfade || 0.6) : 0.6;
-      schedule(hold + s.zoom.dur - nx, next);
-    } else if (s.hold) {
-      var nx2 = SEQ[idx + 1] ? (SEQ[idx + 1].xfade || 0.6) : 0.6;
-      var isDipNext = SEQ[idx + 1] && SEQ[idx + 1].dip;
-      schedule(startDelay + s.hold - (isDipNext ? 0 : nx2), next);
-    } else {
-      // morph clip: dissolve out over its final moments, never a hard stop
-      var s2 = s;
-      function armEnd() {
-        var d = s2.el.duration;
-        var nxf = SEQ[idx + 1] ? (SEQ[idx + 1].xfade || 0.6) : 0.6;
-        var isDip = SEQ[idx + 1] && SEQ[idx + 1].dip;
-        if (isFinite(d) && d > 1) schedule(d - (isDip ? 0.1 : nxf * 0.9), next);
-        else s2.el.addEventListener('ended', function h() { s2.el.removeEventListener('ended', h); next(); });
-      }
-      if (isFinite(s.el.duration) && s.el.duration > 0) armEnd();
-      else s.el.addEventListener('loadedmetadata', armEnd, { once: true });
-      schedule(14, function () { if (SEQ[idx] === s) next(); }); // failsafe
-    }
-  }
-
-  function start() {
-    runToken++;
-    document.getElementById('begin').style.display = 'none';
-    document.getElementById('replay').style.display = 'none';
-    idx = -1;
-    SEQ.forEach(function (s) {
-      gsap.killTweensOf(s.el); gsap.killTweensOf(s.layer);
-      gsap.set(s.layer, { opacity: 0 });
-      gsap.set(s.el, { clearProps: 'transform' });
-      if (s.el.tagName === 'VIDEO') { s.el.pause(); try { s.el.currentTime = 0; } catch (e) {} }
-    });
-    next();
-  }
-
-  // gate Begin on the first chapter being genuinely ready
-  var beginBtn = document.getElementById('begin');
-  var pill = document.getElementById('begin-pill');
-  function readyCheck() {
-    var img0 = SEQ[0].el.complete;
-    var v1 = SEQ[1].el.readyState >= 3;
-    if (img0 && v1) {
-      beginBtn.classList.remove('loading');
-      pill.innerHTML = 'Begin the dive &rarr;';
-      return true;
-    }
-    return false;
-  }
-  var gateTimer = setInterval(function () { if (readyCheck()) clearInterval(gateTimer); }, 300);
-  setTimeout(function () { clearInterval(gateTimer); beginBtn.classList.remove('loading'); pill.innerHTML = 'Begin the dive &rarr;'; }, 12000);
-
-  beginBtn.addEventListener('click', function () {
-    if (beginBtn.classList.contains('loading')) return;
-    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
-    start();
+  film.addEventListener('click', function () {
+    if (film.paused) film.play(); else film.pause();
   });
-  document.getElementById('replay').addEventListener('click', start);
 })();
 </script>
 </body>
