@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Fractal Dive — 4K Trial Film · Gavinger</title>
+<title>The Fractal Dive — Trial Film · Gavinger</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="media/favicon.png">
 <link rel="stylesheet" href="fonts/fonts.css">
@@ -32,19 +32,48 @@
     font:500 .625rem/1 var(--sans); letter-spacing:.32em; text-transform:uppercase;
     color:var(--muted); opacity:.7; pointer-events:none;
   }
+  #quality {
+    position:fixed; right:1.2rem; bottom:1.1rem; z-index:6;
+    font:500 .625rem/1 var(--sans); letter-spacing:.18em; text-transform:uppercase;
+    color:var(--muted); background:rgba(0,0,0,.45); border:1px solid rgba(233,230,223,.25);
+    border-radius:999px; padding:.55em 1.1em; cursor:pointer; transition:color .3s ease;
+  }
+  #quality:hover { color:var(--ink); }
 </style>
 </head>
 <body>
 <video id="film" playsinline preload="auto" loop muted></video>
-<p id="foot">GAVINGER · THE FRACTAL DIVE · 4K TRIAL — ONE CONTINUOUS FILM</p>
-<button id="overlay"><span class="inner"><span class="wm">GAVINGER</span><br><span class="pill">Begin the dive &rarr;</span><span class="note">one continuous film &middot; four of ten seams &middot; 81 seconds &middot; loops &middot; best fullscreen</span></span></button>
+<p id="foot">GAVINGER · THE FRACTAL DIVE · ONE CONTINUOUS FILM</p>
+<button id="quality" title="Toggle quality">HD</button>
+<button id="overlay"><span class="inner"><span class="wm">GAVINGER</span><br><span class="pill">Begin the dive &rarr;</span><span class="note">one continuous film &middot; loops &middot; best fullscreen</span></span></button>
 <script>
 (function () {
   var film = document.getElementById('film');
   var overlay = document.getElementById('overlay');
-  // serve the 4K master to screens that can use it, 1080p elsewhere
-  var big = (screen.width * (devicePixelRatio || 1)) >= 2400;
-  film.src = big ? 'media/trial/film-4k.mp4' : 'media/trial/film-1080.mp4';
+  var qbtn = document.getElementById('quality');
+  // HD (1080p) by default — it decodes smoothly everywhere. 4K is opt-in.
+  var SRC = { hd: 'media/trial/film-1080.mp4', uhd: 'media/trial/film-4k.mp4' };
+  var q = 'hd';
+  try { q = localStorage.getItem('gav-q') === 'uhd' ? 'uhd' : 'hd'; } catch (e) {}
+  function label() { qbtn.textContent = (q === 'uhd') ? '4K ✓' : 'HD · tap for 4K'; }
+  function setSrc(keepTime) {
+    var t = keepTime ? film.currentTime : 0;
+    var playing = !film.paused;
+    film.src = SRC[q];
+    film.load();
+    film.addEventListener('loadedmetadata', function once() {
+      film.removeEventListener('loadedmetadata', once);
+      film.currentTime = t;
+      if (playing) film.play().catch(function () {});
+    });
+    label();
+  }
+  setSrc(false);
+  qbtn.addEventListener('click', function () {
+    q = (q === 'uhd') ? 'hd' : 'uhd';
+    try { localStorage.setItem('gav-q', q); } catch (e) {}
+    setSrc(true);
+  });
   overlay.addEventListener('click', function () {
     overlay.classList.add('gone');
     if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){});
