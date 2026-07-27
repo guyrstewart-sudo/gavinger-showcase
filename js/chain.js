@@ -1,4 +1,5 @@
 // Generated from the dive-analysis workflow — the 10-piece fractal chain.
+// Heroes re-derived 2026-07-26 from Higgsfield 4K masters (2560px cap).
 window.GAV_CHAIN = [
  {
   "h": "in-our-midst-original-art-on-canvas",
@@ -10,14 +11,14 @@ window.GAV_CHAIN = [
   "available": true,
   "url": "https://gavinger.com/products/in-our-midst-original-art-on-canvas",
   "img": "media/img/products__IN-OUR-MIDST-WEB_9fc3cd6b-b87b-4639-86e9-ee89e606ca71.webp",
-  "w": 1263,
+  "w": 2560,
   "cx": 0.37,
   "cy": 0.7,
   "size": 0.18,
   "accent": "#ffc93c",
   "bg": "#150806",
   "line": "Two years distilling the potent energies of a pivotal age into one current.",
-  "hpx": 1010
+  "hpx": 2057
  },
  {
   "h": "midnight-grandfather-clock",
@@ -29,14 +30,14 @@ window.GAV_CHAIN = [
   "available": true,
   "url": "https://gavinger.com/products/midnight-grandfather-clock",
   "img": "media/img/files__2BFDD372-EA73-4D8C-9A52-015EA17057F2.webp",
-  "w": 1238,
+  "w": 1653,
   "cx": 0.505,
   "cy": 0.615,
   "size": 0.24,
   "accent": "#b8e34e",
   "bg": "#070a1e",
   "line": "Time bends here. It glows, it waits — this clock marks becoming.",
-  "hpx": 1920
+  "hpx": 2560
  },
  {
   "h": "black-and-white-grandfather-clock",
@@ -48,14 +49,14 @@ window.GAV_CHAIN = [
   "available": true,
   "url": "https://gavinger.com/products/black-and-white-grandfather-clock",
   "img": "media/img/files__IMG_8842.webp",
-  "w": 1440,
+  "w": 1920,
   "cx": 0.51,
   "cy": 0.59,
   "size": 0.17,
   "accent": "#38e3b2",
   "bg": "#060f0d",
   "line": "Stripped to raw wood, reborn line by freehand line; light obeys the button.",
-  "hpx": 1920
+  "hpx": 2560
  },
  {
   "h": "the-transmuter",
@@ -67,14 +68,14 @@ window.GAV_CHAIN = [
   "available": false,
   "url": "https://gavinger.com/products/the-transmuter",
   "img": "media/img/products__GavinGerundo04_2022_11_web.webp",
-  "w": 512,
+  "w": 1706,
   "cx": 0.51,
   "cy": 0.73,
   "size": 0.28,
   "accent": "#ff44a1",
   "bg": "#041008",
   "line": "A grandfather clock reborn in acrylic and paint pen, my largest transmutation yet.",
-  "hpx": 768
+  "hpx": 2560
  },
  {
   "h": "labyrinth-original-art-on-canvas",
@@ -86,14 +87,14 @@ window.GAV_CHAIN = [
   "available": false,
   "url": "https://gavinger.com/products/labyrinth-original-art-on-canvas",
   "img": "media/img/products__PILGRIMAGE-WEB.webp",
-  "w": 864,
+  "w": 2201,
   "cx": 0.5,
   "cy": 0.38,
   "size": 0.24,
   "accent": "#d63fa0",
   "bg": "#061109",
   "line": "Walk the labyrinth long enough and the path turns vertical, spiraling home to Earth.",
-  "hpx": 1008
+  "hpx": 2560
  },
  {
   "h": "a-moment-of-transparency-original-art-on-canvas",
@@ -105,14 +106,14 @@ window.GAV_CHAIN = [
   "available": true,
   "url": "https://gavinger.com/products/a-moment-of-transparency-original-art-on-canvas",
   "img": "media/img/products__A-Moment-of-Transparency-WEB_3b5c90f0-26cc-4cd0-8b2e-39f061263354.webp",
-  "w": 1010,
+  "w": 2560,
   "cx": 0.7,
   "cy": 0.67,
   "size": 0.26,
   "accent": "#4fd9a8",
   "bg": "#0b0814",
   "line": "Painted at a crossroad, in fury and unknowing, until everything became transparent.",
-  "hpx": 1017
+  "hpx": 2560
  },
  {
   "h": "primordial-reverie-framed-original-art-on-canvas",
@@ -124,14 +125,14 @@ window.GAV_CHAIN = [
   "available": false,
   "url": "https://gavinger.com/products/primordial-reverie-framed-original-art-on-canvas",
   "img": "media/img/products__IMG_7101.webp",
-  "w": 1519,
+  "w": 2032,
   "cx": 0.665,
   "cy": 0.505,
   "size": 0.18,
   "accent": "#ff8c26",
   "bg": "#150705",
   "line": "Born for awe: the cathedrals in the sky reflect the glimmer in your eye.",
-  "hpx": 1920
+  "hpx": 2560
  },
  {
   "h": "curiosity",
@@ -143,14 +144,14 @@ window.GAV_CHAIN = [
   "available": false,
   "url": "https://gavinger.com/products/curiosity",
   "img": "media/img/products__FE5D0DAC-9927-4391-81B5-B3DB74AFA0A0.webp",
-  "w": 1010,
+  "w": 2560,
   "cx": 0.505,
   "cy": 0.82,
   "size": 0.18,
   "accent": "#35c8f5",
   "bg": "#0a0c1c",
   "line": "A hand-painted vessel, pulsing with sound, built to launch your mind past Mars.",
-  "hpx": 1010
+  "hpx": 2560
  },
  {
   "h": "conquering-carbon-framed-original-art-on-canvas",
@@ -162,14 +163,14 @@ window.GAV_CHAIN = [
   "available": true,
   "url": "https://gavinger.com/products/conquering-carbon-framed-original-art-on-canvas",
   "img": "media/img/products__CONQUERING-CARBON-WEB_a1620430-9960-4c51-b98a-8e8d6005e1da.webp",
-  "w": 1010,
+  "w": 2560,
   "cx": 0.5,
   "cy": 0.815,
   "size": 0.2,
   "accent": "#8fe14b",
   "bg": "#0a120b",
   "line": "Begun in the Chapel of Sacred Mirrors, a meditation on Fear Inoculum.",
-  "hpx": 1010
+  "hpx": 2560
  },
  {
   "h": "tubular-20s-antique-radio-lamp",
@@ -181,13 +182,13 @@ window.GAV_CHAIN = [
   "available": false,
   "url": "https://gavinger.com/products/tubular-20s-antique-radio-lamp",
   "img": "media/img/files__6FA08F48-CF8B-4253-8F51-602DE136644F.webp",
-  "w": 1440,
+  "w": 1920,
   "cx": 0.5,
   "cy": 0.762,
   "size": 0.2,
   "accent": "#f0a63f",
   "bg": "#071512",
   "line": "A century-old radio reborn in stained glass, still listening for the signal.",
-  "hpx": 1920
+  "hpx": 2560
  }
 ];
