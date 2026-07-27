@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Fractal Dive — 4K Trial Film · Gavinger</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="media/favicon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  :root { --ink:#E9E6DF; --muted:#8F8C84; --accent:#ffc93c;
+    --serif:'Cormorant', Georgia, serif; --sans:'Instrument Sans', system-ui, sans-serif; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#000; color:var(--ink); font-family:var(--sans); overflow:hidden; height:100vh; }
+  #stage { position:fixed; inset:0; background:#000; }
+  .layer { position:absolute; inset:0; opacity:0; will-change:transform,opacity; }
+  .layer img, .layer video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .layer.fit-plate video { object-fit:contain; }
+  #caption {
+    position:fixed; left:clamp(1.4rem,5vw,4rem); bottom:clamp(1.6rem,6vh,3.5rem); z-index:20;
+    opacity:0; transition:opacity .6s ease; max-width:80vw;
+  }
+  #caption .eyebrow { font:500 .6875rem/1 var(--sans); letter-spacing:.32em; text-transform:uppercase; color:var(--accent); }
+  #caption h2 { font:300 clamp(1.6rem,3.4vw,2.6rem)/1.1 var(--serif); margin-top:.5em; text-shadow:0 2px 24px rgba(0,0,0,.8); }
+  #begin, #replay {
+    position:fixed; inset:0; z-index:30; display:grid; place-items:center;
+    background:rgba(0,0,0,.85); cursor:pointer; border:0; color:var(--ink);
+  }
+  #begin .inner, #replay .inner { text-align:center; }
+  .wm { font:300 clamp(2rem,6vw,4.5rem)/1 var(--serif); letter-spacing:.22em; color:transparent; -webkit-text-stroke:1px rgba(233,230,223,.35); }
+  .pill {
+    display:inline-block; margin-top:2rem; font:500 .8125rem/1 var(--sans); letter-spacing:.14em;
+    text-transform:uppercase; color:var(--ink); border:1px solid rgba(233,230,223,.35);
+    border-radius:999px; padding:.9em 2.4em; background:transparent;
+  }
+  #replay { display:none; }
+  .note { margin-top:1rem; font:italic 400 .85rem/1.5 var(--serif); color:var(--muted); }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="caption"><p class="eyebrow" id="cap-eyebrow"></p><h2 id="cap-title"></h2></div>
+<button id="begin"><span class="inner"><span class="wm">GAVINGER</span><br><span class="pill">Begin the dive &rarr;</span><br><span class="note">4K trial &middot; three of ten seams &middot; best fullscreen</span></span></button>
+<button id="replay"><span class="inner"><span class="wm">GAVINGER</span><br><span class="pill">Replay &orarr;</span></span></button>
+
+<script src="js/vendor/gsap.min.js"></script>
+<script>
+(function () {
+  'use strict';
+  var stage = document.getElementById('stage');
+  var caption = document.getElementById('caption');
+  var capE = document.getElementById('cap-eyebrow');
+  var capT = document.getElementById('cap-title');
+
+  // The sequence. zoomTo = {scale, ox, oy} applied across the step's length
+  // so the frame lands exactly where the next clip begins.
+  var SEQ = [
+    { img: 'media/img/products__IN-OUR-MIDST-WEB_9fc3cd6b-b87b-4639-86e9-ee89e606ca71.webp',
+      dur: 3.0, zoomTo: { scale: 5.5, ox: '37%', oy: '70%' },
+      cap: ['01 · IN OUR MIDST — $27,000', 'The dive begins in the painting'] },
+    { vid: 'media/trial/seam1.mp4',
+      cap: ['SEAM · MAZE INTO MIDNIGHT', 'Generated 4K transformation'] },
+    { vid: 'media/trial/midnight-4k.mp4', plate: true, dur: 5.0,
+      cap: ['02 · MIDNIGHT GRANDFATHER CLOCK — $17,000', 'Real footage, 4K upscaled'] },
+    { vid: 'media/trial/midnight-4k.mp4', plate: true, dur: 1.6, zoomTo: { scale: 4.2, ox: '50%', oy: '61%' },
+      cap: ['02 · MIDNIGHT GRANDFATHER CLOCK', 'Diving into the pendulum window'] },
+    { vid: 'media/trial/seam2.mp4', optional: true,
+      cap: ['SEAM · DRAWN FROM DARKNESS', 'Generated 4K — video to video'] },
+    { vid: 'media/trial/bw-4k.mp4', dur: 5.0, optional: true,
+      cap: ['03 · BLACK & WHITE GRANDFATHER CLOCK — $12,000', 'Real footage, 4K upscaled'] },
+    { img: 'media/img/products__PILGRIMAGE-WEB.webp',
+      dur: 2.6, zoomTo: { scale: 4.2, ox: '50%', oy: '38%' }, fadeIn: true,
+      cap: ['05 · LABYRINTH — $9,000', 'Original on canvas'] },
+    { vid: 'media/trial/seam5.mp4',
+      cap: ['SEAM · BECOMING TRANSPARENT', 'Generated 4K transformation'] },
+    { img: 'media/img/products__A-Moment-of-Transparency-WEB_3b5c90f0-26cc-4cd0-8b2e-39f061263354.webp',
+      dur: 3.0, zoomTo: { scale: 1.06, ox: '50%', oy: '50%' },
+      cap: ['06 · A MOMENT OF TRANSPARENCY — $8,500', 'Original on canvas'] },
+    { vid: 'media/trial/echo-4k.mp4', dur: 3.4, fadeIn: true,
+      cap: ['10 · ECHO — $5,500', 'Real footage, 4K upscaled'] },
+    { vid: 'media/trial/echo-4k.mp4', dur: 1.5, zoomTo: { scale: 2.6, ox: '50%', oy: '62%' },
+      cap: ['10 · ECHO', 'Diving into the grille'] },
+    { vid: 'media/trial/seam10.mp4',
+      cap: ['SEAM · GRILLE TO GALAXY', 'Generated 4K — the loop closes'] },
+    { img: 'media/img/products__IN-OUR-MIDST-WEB_9fc3cd6b-b87b-4639-86e9-ee89e606ca71.webp',
+      dur: 3.5, zoomTo: { scale: 1.05, ox: '50%', oy: '50%' },
+      cap: ['01 · IN OUR MIDST', 'The finite reveals the infinite'] },
+  ];
+
+  // build layers
+  SEQ.forEach(function (s) {
+    var layer = document.createElement('div');
+    layer.className = 'layer' + (s.plate ? ' fit-plate' : '');
+    if (s.img) {
+      var im = document.createElement('img');
+      im.src = s.img; im.alt = '';
+      layer.appendChild(im); s.el = im;
+    } else {
+      var v = document.createElement('video');
+      v.muted = true; v.playsInline = true; v.preload = 'auto';
+      v.src = s.vid;
+      layer.appendChild(v); s.el = v;
+      v.addEventListener('error', function () { s.failed = true; });
+    }
+    stage.appendChild(layer);
+    s.layer = layer;
+  });
+
+  var idx = -1;
+  function setCaption(c) {
+    capE.textContent = c[0]; capT.textContent = c[1];
+    caption.style.opacity = 1;
+  }
+  function next() {
+    idx++;
+    while (idx < SEQ.length && SEQ[idx].optional && SEQ[idx].failed) idx++;
+    if (idx >= SEQ.length) {
+      document.getElementById('replay').style.display = 'grid';
+      caption.style.opacity = 0;
+      return;
+    }
+    var s = SEQ[idx];
+    var prev = SEQ[idx - 1];
+    gsap.set(s.layer, { zIndex: 10 + idx });
+    gsap.fromTo(s.layer, { opacity: s.fadeIn ? 0 : 1 }, { opacity: 1, duration: s.fadeIn ? 0.8 : 0.12, ease: 'sine.out' });
+    if (prev) gsap.to(prev.layer, { opacity: 0, duration: 0.5, delay: s.fadeIn ? 0.5 : 0.15, onComplete: function () {
+      if (prev.el.tagName === 'VIDEO') prev.el.pause();
+      gsap.set(prev.el, { clearProps: 'transform' });
+    }});
+    setCaption(s.cap);
+    if (s.zoomTo) {
+      gsap.set(s.el, { transformOrigin: s.zoomTo.ox + ' ' + s.zoomTo.oy, scale: s.el._holdScale || 1 });
+      gsap.to(s.el, { scale: s.zoomTo.scale, duration: s.dur, ease: s.zoomTo.scale > 2 ? 'power2.in' : 'none' });
+    }
+    if (s.el.tagName === 'VIDEO') {
+      if (s.vid && SEQ[idx - 1] && SEQ[idx - 1].vid === s.vid) {
+        // continuing the same footage (zoom step): keep playing, don't restart
+      } else {
+        try { s.el.currentTime = 0; } catch (e) {}
+        s.el.play().catch(function () {});
+      }
+      if (s.dur) {
+        gsap.delayedCall(s.dur, next);
+      } else {
+        s.el.addEventListener('ended', function h() { s.el.removeEventListener('ended', h); next(); });
+        gsap.delayedCall(12, function () { if (SEQ[idx] === s) next(); }); // failsafe
+      }
+    } else {
+      gsap.delayedCall(s.dur, next);
+    }
+  }
+
+  function start() {
+    document.getElementById('begin').style.display = 'none';
+    document.getElementById('replay').style.display = 'none';
+    idx = -1;
+    SEQ.forEach(function (s) { gsap.set(s.layer, { opacity: 0 }); gsap.set(s.el, { clearProps: 'transform' }); });
+    next();
+  }
+  document.getElementById('begin').addEventListener('click', function () {
+    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
+    start();
+  });
+  document.getElementById('replay').addEventListener('click', start);
+})();
+</script>
+</body>
+</html>
