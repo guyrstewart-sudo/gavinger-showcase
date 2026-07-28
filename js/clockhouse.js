@@ -43,6 +43,8 @@
      ------------------------------------------------------------ */
   function fitCase() {
     var W = window.innerWidth, H = window.innerHeight;
+    if (W < 2 || H < 2) return;          /* a zero viewport would place the leaves
+                                            at 0×0 and leave the case in pieces */
     var s = Math.max(W / IMG.w, H / IMG.h);
     var dw = IMG.w * s, dh = IMG.h * s;
     var x = (W - dw) / 2;
