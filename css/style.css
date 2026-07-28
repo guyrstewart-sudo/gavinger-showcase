@@ -313,29 +313,47 @@ body.reduced-motion #dive-nav { display: none; }
 .chapter-head .pill { margin-top: 2.2rem; }
 
 /* 02 · timeless — horizontal rail */
-#timeless { padding-bottom: 0; }
+/* The WHOLE section pins — heading and rail together — so the composition
+   the visitor is looking at when it locks is the one they keep while the
+   products pan past. Pinning the rail alone scrolled the heading away first
+   and left the rail floating in a black screen. */
+#timeless {
+  height: 100vh; height: 100svh;
+  padding: 12vh clamp(1.4rem, 6vw, 7rem) 3vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+#timeless .chapter-head { flex: none; }
 /* the rail exits pinned, so the next chapter does not need a full 18vh run-up */
 #funktional { padding-top: 7vh; }
 #timeless-pin {
-  height: 100vh; height: 100svh;
-  /* pinning a short rail at the top of a tall screen dumps the whole remainder
-     into one black slab under it. Centred, the same slack splits above and
-     below and reads as breathing room instead of a gap. */
-  display: flex; align-items: center;
+  flex: 1; min-height: 0;              /* takes whatever the heading leaves */
+  margin: 3vh calc(-1 * clamp(1.4rem, 6vw, 7rem)) 0;   /* rail bleeds to the edges */
+  display: flex; align-items: stretch;
   overflow: hidden;
 }
 #timeless-track {
+  height: 100%;
   display: flex; gap: clamp(1.2rem, 3vw, 3rem);
   padding: 0 clamp(1.4rem, 6vw, 7rem);
   will-change: transform;
 }
-.clock-card { flex: none; width: clamp(240px, 46svh, 430px); }
-/* sized off viewport HEIGHT, not width: while the rail is pinned the whole
-   screen is the rail, and a card sized off vw left the lower third empty */
+/* the card takes its HEIGHT from the space the heading leaves, and its width
+   is set from that height by sizeRail() in sections.js. aspect-ratio cannot do
+   this on its own: the column stretches the frame to the card's width, and the
+   card's width is what we are trying to derive — it collapses to nothing. */
+.clock-card {
+  flex: none;
+  height: 100%;
+  width: var(--card-w, clamp(240px, 40svh, 430px));
+  display: flex; flex-direction: column;
+}
+.clock-card figcaption { flex: none; }
 .clock-card .frame {
-  display: block; /* <a> is inline by default — aspect-ratio needs a block box */
+  display: block;
   position: relative;
-  aspect-ratio: 3 / 4;
+  flex: 1 1 auto; min-height: 0;  /* takes the height; 3:4 comes from --card-w */
+  width: 100%;
   overflow: hidden;
   background: #0a0a0a;
 }
@@ -506,6 +524,9 @@ body.reduced-motion .dive-layer {
 body.reduced-motion .dive-layer.is-clone { display: none; }
 body.reduced-motion .dive-layer { will-change: auto; }
 body.reduced-motion #rail { display: none; }
+/* the progress gauge sits on top of the artwork on a phone and there is no
+   room to move it — phones lose it entirely */
+@media (max-width: 700px) { #rail { display: none; } }
 body.reduced-motion .dive-zoom { position: static; }
 body.reduced-motion .dive-art { position: static; width: 100%; height: auto; object-fit: contain; max-height: 92vh; }
 body.reduced-motion #dive-cards { position: static; pointer-events: auto; }
@@ -557,7 +578,6 @@ body.reduced-motion #dive-hint { display: none; }
   #site-head { padding: 0.9rem 1.4rem 1.1rem; }
   #brand img { height: 28px; }
   #index-open { font-size: 0.95rem; }
-  .clock-card { width: 74vw; }
   .dive-card .dive-line { display: none; }
   .dive-card .colophon { display: none; }
 }

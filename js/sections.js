@@ -71,6 +71,26 @@
   }
 
   var pinWrap = document.getElementById('timeless-pin');
+
+  /* The whole section pins, so the rail only gets what the heading leaves.
+     Derive the card width from that leftover height (frames are 3:4) — CSS
+     cannot, because the column stretches the frame to the card's width and the
+     card's width is precisely what we are solving for. */
+  function sizeRail() {
+    if (!track.children.length) return;
+    var cap = track.querySelector('figcaption');
+    var capH = cap ? cap.getBoundingClientRect().height + parseFloat(getComputedStyle(cap).marginTop || 0) : 40;
+    var frameH = pinWrap.clientHeight - capH;
+    if (frameH < 80) return;
+    track.style.setProperty('--card-w', Math.round(frameH * 0.75) + 'px');
+  }
+  sizeRail();
+  var railSizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(railSizeTimer);
+    railSizeTimer = setTimeout(function () { sizeRail(); ScrollTrigger.refresh(); }, 180);
+  });
+
   mm.add('(prefers-reduced-motion: no-preference)', function () {
     if (!track.children.length) return;
     gsap.to(track, {
@@ -78,8 +98,11 @@
       ease: 'none',
       scrollTrigger: {
         id: 'timeless',
-        trigger: pinWrap,
-        pin: true,
+        // pin the whole section, not just the rail: the heading has to stay on
+        // screen with the products moving under it — that composition IS the
+        // anchored state. Pinning pinWrap alone scrolled the heading off first.
+        trigger: '#timeless',
+        pin: '#timeless',
         scrub: true,
         start: 'top top',
         // the rail pans FASTER than the page scrolls (0.6:1) — at 1:1 the
