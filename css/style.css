@@ -537,11 +537,12 @@ body.reduced-motion #dive-hint { display: none; }
   #rail { right: 0.7rem; }
   #brand img { height: 34px; }
 }
-@media (max-width: 1420px) {
-  #shop-nav a:nth-child(7) { display: none; }   /* Custom Furniture Inquiry */
-}
-@media (max-width: 1240px) {
-  #shop-nav a:nth-child(4), #shop-nav a:nth-child(6) { display: none; } /* Accessories, Clothing */
+/* six short labels fit where eight long ones did not — nothing is dropped
+   until the nav gives way entirely on phones. Between 1050 and 1200 the set
+   still needs help, so it tightens rather than losing a section. */
+@media (max-width: 1200px) {
+  #shop-nav { gap: 0.75rem; }
+  #shop-nav a { font-size: 0.82rem; }
 }
 @media (max-width: 1050px) {
   #shop-nav { display: none; }                   /* logo + INDEX only */
