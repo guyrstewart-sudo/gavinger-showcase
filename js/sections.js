@@ -82,7 +82,13 @@
         pin: true,
         scrub: true,
         start: 'top top',
-        end: function () { return '+=' + Math.max(1200, track.scrollWidth - pinWrap.clientWidth + 400); },
+        // the rail pans FASTER than the page scrolls (0.6:1) — at 1:1 the
+        // section held the screen for ~4500px, which is what read as too much
+        // dead space. The old +400 tail also kept it pinned after the rail had
+        // already stopped moving.
+        end: function () {
+          return '+=' + Math.max(700, (track.scrollWidth - pinWrap.clientWidth) * 0.6 + 120);
+        },
         invalidateOnRefresh: true
       }
     });

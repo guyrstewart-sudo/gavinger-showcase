@@ -314,12 +314,14 @@ body.reduced-motion #dive-nav { display: none; }
 
 /* 02 · timeless — horizontal rail */
 #timeless { padding-bottom: 0; }
+/* the rail exits pinned, so the next chapter does not need a full 18vh run-up */
+#funktional { padding-top: 7vh; }
 #timeless-pin {
   height: 100vh; height: 100svh;
-  /* cards sit 8vh under the heading, matching the funktional grid's rhythm —
-     centering them in the pinned viewport left a ~370px dead gap */
-  display: flex; align-items: flex-start;
-  padding-top: 8vh;
+  /* pinning a short rail at the top of a tall screen dumps the whole remainder
+     into one black slab under it. Centred, the same slack splits above and
+     below and reads as breathing room instead of a gap. */
+  display: flex; align-items: center;
   overflow: hidden;
 }
 #timeless-track {
@@ -327,7 +329,9 @@ body.reduced-motion #dive-nav { display: none; }
   padding: 0 clamp(1.4rem, 6vw, 7rem);
   will-change: transform;
 }
-.clock-card { flex: none; width: clamp(240px, 26vw, 400px); }
+.clock-card { flex: none; width: clamp(240px, 46svh, 430px); }
+/* sized off viewport HEIGHT, not width: while the rail is pinned the whole
+   screen is the rail, and a card sized off vw left the lower third empty */
 .clock-card .frame {
   display: block; /* <a> is inline by default — aspect-ratio needs a block box */
   position: relative;
