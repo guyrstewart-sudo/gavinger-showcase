@@ -316,7 +316,10 @@ body.reduced-motion #dive-nav { display: none; }
 #timeless { padding-bottom: 0; }
 #timeless-pin {
   height: 100vh; height: 100svh;
-  display: flex; align-items: center;
+  /* cards sit 8vh under the heading, matching the funktional grid's rhythm —
+     centering them in the pinned viewport left a ~370px dead gap */
+  display: flex; align-items: flex-start;
+  padding-top: 8vh;
   overflow: hidden;
 }
 #timeless-track {
