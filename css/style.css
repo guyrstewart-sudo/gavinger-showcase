@@ -312,6 +312,23 @@ body.reduced-motion #dive-nav { display: none; }
 .chapter-head.center .support { margin: 0 auto; }
 .chapter-head .pill { margin-top: 2.2rem; }
 
+/* a section whose work is not online yet — states it plainly rather than
+   dressing an empty wall with borrowed images */
+.in-prep {
+  display: grid;
+  justify-items: start;
+  gap: 2rem;
+  max-width: 52ch;
+  margin-top: 1vh;
+  padding: clamp(1.8rem, 4vw, 3rem);
+  border: 1px solid var(--hairline);
+  background: rgba(233, 230, 223, 0.02);
+}
+.in-prep .prep-note {
+  font: italic 400 1rem/1.7 var(--serif);
+  color: var(--muted);
+}
+
 /* 02 · timeless — horizontal rail */
 /* The WHOLE section pins — heading and rail together — so the composition
    the visitor is looking at when it locks is the one they keep while the
